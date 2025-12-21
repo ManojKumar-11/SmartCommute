@@ -1,0 +1,16 @@
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import PassEntryScreen from "../screens/PassEntryScreen";
+
+const Stack = createNativeStackNavigator();
+
+export default function PassStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="PassEntry"
+        component={PassEntryScreen}
+        options={{ title: "My Pass" }}
+      />
+    </Stack.Navigator>
+  );
+}
