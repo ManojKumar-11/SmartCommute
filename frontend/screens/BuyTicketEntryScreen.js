@@ -25,7 +25,6 @@ export default function BuyTicketEntryScreen({ navigation }) {
       
       {/* Header Context */}
       <View style={styles.header}>
-        {/* <Text style={styles.title}>Buy Ticket</Text> */}
         <Text style={styles.subtitle}>
           Get a one-time ticket for the bus you are in
         </Text>
@@ -33,7 +32,8 @@ export default function BuyTicketEntryScreen({ navigation }) {
 
       {/* Main Actions */}
       <View style={styles.actionSection}>
-        <Pressable style={styles.scanCard} onPress={() => {}}>
+        <Pressable style={styles.scanCard} onPress={() => navigation.navigate("BusQRScan")}
+          >
           <Ionicons name="qr-code-outline" size={72} color="#1E3A8A" />
           <Text style={styles.scanText}>Scan Bus QR</Text>
         </Pressable>
@@ -41,19 +41,23 @@ export default function BuyTicketEntryScreen({ navigation }) {
         <Text style={styles.or}>OR</Text>
 
         <Pressable style={styles.manualBtn} onPress={() => navigation.navigate("BusCodeInput")}>
-          <Ionicons name="create-outline" size={20} color="#1E3A8A" />
-          <Text style={styles.manualText}>Enter Bus Number </Text>
+          <Ionicons name="create-outline" size={22} color="#1E3A8A" />
+          <Text style={styles.manualText}>Enter Bus Number</Text>
         </Pressable>
       </View>
 
-      <Pressable
-        style={styles.activeTicketsBtn}
-        onPress={openActiveTickets}
-      >
-        <Ionicons name="ticket-outline" size={18} color="#1E3A8A" />
-        <Text style={styles.activeTicketsText}>View Active Tickets</Text>
-      </Pressable>
-
+      {/* Active Tickets Section */}
+      <View style={styles.activeTicketsSection}>
+        <Pressable
+          style={styles.activeTicketsBtn}
+          onPress={openActiveTickets}
+        >
+          <View style={styles.activeTicketsContent}>
+            <Ionicons name="ticket-outline" size={26} color="#1E3A8A" />
+            <Text style={styles.activeTicketsText}>View Active Tickets</Text>
+          </View>
+        </Pressable>
+      </View>
 
       {/* Footer Note */}
       <Text style={styles.footer}>
@@ -68,13 +72,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    justifyContent: "space-between",
     backgroundColor: "#F9FAFB",
   },
   header: {
     alignItems: "center",
-    marginTop: 60,
-    padding : 5
+    marginTop: 30,
+    padding: 5,
+    marginBottom: 24,
   },
   title: {
     fontSize: 22,
@@ -82,70 +86,101 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
   subtitle: {
-  fontSize: 20,
-  color: "#6B7280",
-  marginTop: 5,
-  textAlign: "center",
-  lineHeight: 20,
-},
+    fontSize: 20,
+    color: "#6B7280",
+    marginTop: 5,
+    textAlign: "center",
+    lineHeight: 28,
+  },
   actionSection: {
     alignItems: "center",
+    marginBottom: 32,
   },
   scanCard: {
     width: "100%",
-    paddingVertical: 30,
-    borderRadius: 12,
+    paddingVertical: 40,
+    borderRadius: 16,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   scanText: {
-    marginTop: 12,
-    fontSize: 16,
+    marginTop: 16,
+    fontSize: 18,
     fontWeight: "600",
     color: "#1E3A8A",
   },
   or: {
-    marginVertical: 14,
-    fontSize: 14,
+    marginVertical: 20,
+    fontSize: 15,
     color: "#6B7280",
+    fontWeight: "500",
   },
   manualBtn: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 8,
-    borderWidth: 1,
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: "#1E3A8A",
+    backgroundColor: "#FFFFFF",
+    minWidth: 200,
   },
   manualText: {
-    marginLeft: 8,
-    fontSize: 14,
+    marginLeft: 10,
+    fontSize: 16,
     color: "#1E3A8A",
-    fontWeight: "500",
+    fontWeight: "600",
   },
-  footer: {
-    fontSize: 12,
-    color: "#6B7280",
-    textAlign: "center",
+  activeTicketsSection: {
+    marginTop: 32,
+    marginBottom: 16,
   },
   activeTicketsBtn: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginTop: 18,
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 8,
-  backgroundColor: "#EEF2FF",
-},
-
-activeTicketsText: {
-  marginLeft: 8,
-  fontSize: 14,
-  color: "#1E3A8A",
-  fontWeight: "500",
-},
-
+    width: "100%",
+    borderRadius: 14,
+    backgroundColor: "#EEF2FF",
+    borderWidth: 2,
+    borderColor: "#C7D2FE",
+    shadowColor: "#1E3A8A",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  activeTicketsContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 22,
+    paddingHorizontal: 20,
+  },
+  activeTicketsText: {
+    marginLeft: 12,
+    fontSize: 18,
+    color: "#1E3A8A",
+    fontWeight: "700",
+  },
+  footer: {
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "center",
+    marginTop: "auto",
+    marginBottom: 8,
+    lineHeight: 18,
+  },
 });

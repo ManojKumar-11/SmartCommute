@@ -5,6 +5,7 @@ import SelectStopsScreen from "../screens/SelectStopsScreen";
 import ConfirmTicketScreen from "../screens/ConfirmTicketScreen";
 import ActiveTicketsScreen from "../screens/ActiveTicketsScreen";
 import TicketQRScreen from "../screens/TicketQRScreen";
+import BusQRScanScreen from "../screens/BusQRScanScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,11 @@ export default function BuyTicketStack() {
       headerBackVisible: false
   }}
     />
+    <Stack.Screen
+    name="BusQRScan"
+    component={BusQRScanScreen}
+    options={{ headerShown: false }}
+  />
     </Stack.Navigator>
   );
 }
