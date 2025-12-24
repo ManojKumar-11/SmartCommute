@@ -1,12 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeStack from "./HomeStack";
-import BuyTicketStack from "./BuyTicketStack";
-import PassStack from "./PassStack";
+import HomeStack from "./passenger/HomeStack";
+import BuyTicketStack from "./passenger/BuyTicketStack";
+import PassStack from "./passenger/PassStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Tab = createBottomTabNavigator();
 
-export default function TabNavigator() {
+export default function PassengerTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{

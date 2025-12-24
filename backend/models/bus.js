@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const busSchema = new mongoose.Schema({
+  currentConductor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Conductor",
+    default: null
+  },
   busCode: {
     type: String,
     required: true,
@@ -16,15 +21,15 @@ const busSchema = new mongoose.Schema({
   direction: {
     type: String,
     enum: ["FORWARD", "REVERSE"],
-    default: "FORWARD"
+    default: null
   },
     currentStopIndex: {
     type: Number,
-    default: 0
+    default: null
   },
   isActive: {
     type: Boolean,
-    default: true
+    default: false
   },
   createdAt: {
     type: Date,

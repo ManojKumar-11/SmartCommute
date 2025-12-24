@@ -1,12 +1,17 @@
 import { NavigationContainer } from "@react-navigation/native";
-import TabNavigator from "./navigation/TabNavigator";
-import BusQRDevScreen from "./screens/BusQrDevScreen";
+import PassengerTabNavigator from "./navigation/PassengerTabNavigator";
+import ConductorTabNavigator from "./navigation/ConductorTabNavigator";
+
+import BusQRDevScreen from "./screens/passenger/BusQrDevScreen";
+
+let userRole = "conductor";
 
 export default function App() {
   return (
     <NavigationContainer>
-      <TabNavigator />
+      {userRole === "passenger" && <PassengerTabNavigator />}
+      {userRole === "conductor" && <ConductorTabNavigator />}
     </NavigationContainer>
-    // <BusQRDevScreen/>
+    // <BusQRDevScreen />
   );
 }

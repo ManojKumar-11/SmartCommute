@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import PassEntryScreen from "../screens/PassEntryScreen";
+import PassEntryScreen from "../../screens/passenger/PassEntryScreen";
 
 const Stack = createNativeStackNavigator();
 

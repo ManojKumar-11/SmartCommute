@@ -4,8 +4,8 @@ import QRCode from "react-native-qrcode-svg";
 export default function BusQRDevScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bus QR – SC-003</Text>
-      <QRCode value="SC-003" size={200} />
+      <Text style={styles.title}>Bus QR – SC-004</Text>
+      <QRCode value="SC-004" size={200} />
     </View>
   );
 }

@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BuyTicketEntryScreen from "../screens/BuyTicketEntryScreen";
-import BusCodeInputScreen from "../screens/BusCodeInputScreen";
-import SelectStopsScreen from "../screens/SelectStopsScreen";
-import ConfirmTicketScreen from "../screens/ConfirmTicketScreen";
-import ActiveTicketsScreen from "../screens/ActiveTicketsScreen";
-import TicketQRScreen from "../screens/TicketQRScreen";
-import BusQRScanScreen from "../screens/BusQRScanScreen";
+import BuyTicketEntryScreen from "../../screens/passenger/BuyTicketEntryScreen";
+import BusCodeInputScreen from "../../screens/passenger/BusCodeInputScreen";
+import SelectStopsScreen from "../../screens/passenger/SelectStopsScreen";
+import ConfirmTicketScreen from "../../screens/passenger/ConfirmTicketScreen";
+import ActiveTicketsScreen from "../../screens/passenger/ActiveTicketsScreen";
+import TicketQRScreen from "../../screens/passenger/TicketQRScreen";
+import BusQRScanScreen from "../../screens/passenger/BusQRScanScreen";
 
 const Stack = createNativeStackNavigator();
 

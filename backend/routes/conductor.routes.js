@@ -1,80 +1,145 @@
 const express = require("express");
 const router = express.Router();
 const Bus = require("../models/bus");
+const Conductor = require("../models/conductor");
 
-// CONDUCTOR: SET BUS DIRECTION
-router.post("/set-direction", async (req, res) => {
-  const { busCode, direction } = req.body;
-
-  if (!busCode || !["FORWARD", "REVERSE"].includes(direction)) {
-    return res.status(400).json({ error: "Invalid direction data" });
-  }
-
+// GET BUS ASSIGNED TO CONDUCTOR
+router.get("/:conductorId/bus", async (req, res) => {
   try {
-    const bus = await Bus.findOne({ busCode });
+    const { conductorId } = req.params;
 
-    if (!bus) {
-      return res.status(404).json({ error: "Bus not found" });
+    const conductor = await Conductor.findOne({ conductorId });
+    if (!conductor) {
+      return res.status(404).json({ error: "Conductor not found" });
     }
 
-    bus.direction = direction;
-    await bus.save();
-
-    res.json({
-      message: "Direction updated",
-      busCode: bus.busCode,
-      direction: bus.direction
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update direction" });
-  }
-});
-
-
-// UPDATE CURRENT STOP
-router.post("/update-current-stop", async (req, res) => {
-  const { busCode, stopName } = req.body;
-
-  if (!busCode || !stopName) {
-    return res.status(400).json({ error: "Missing data" });
-  }
-
-  try {
-    const bus = await Bus.findOne({ busCode, isActive: true });
+    const bus = await Bus.findOne({ currentConductor: conductor._id });
     if (!bus) {
-      return res.status(404).json({ error: "Bus not found" });
+      return res.status(404).json({ error: "No bus assigned to this conductor" });
     }
 
+    // Determine journey order
     const effectiveStops =
       bus.direction === "FORWARD"
         ? bus.stops
         : [...bus.stops].reverse();
 
-    const index = effectiveStops.indexOf(stopName);
-    if (index === -1) {
-      return res.status(400).json({ error: "Invalid stop" });
-    }
+    const index = bus.currentStopIndex;
 
-    if (index < bus.currentStopIndex) {
-      return res.status(409).json({ error: "Cannot move backwards" });
-    }
+    const currentStop =
+      typeof index === "number" &&
+      index >= 0 &&
+      index < effectiveStops.length
+        ? effectiveStops[index]
+        : null;
 
-    bus.currentStopIndex = index;
-    await bus.save();
-
-    res.json({
-      message: "Current stop updated",
-      busCode,
-      currentStop: stopName,
-      currentStopIndex: index
+    return res.json({
+      busCode: bus.busCode,
+      isActive: bus.isActive,
+      direction: bus.direction,
+      currentStopIndex: index,
+      currentStop,
+      stops: effectiveStops,
+      totalStops: effectiveStops.length
     });
 
   } catch (err) {
-    res.status(500).json({ error: "Failed to update stop" });
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
 
+// UPDATE CURRENT STOP
+router.post("/update-stop", async (req, res) => {
+  const { busCode, currentStopIndex } = req.body;
+
+  const bus = await Bus.findOne({ busCode });
+
+  if (!bus) {
+    return res.status(404).json({ error: "Bus not found" });
+  }
+
+  if (!bus.isActive) {
+    return res.status(400).json({ error: "Bus is not active" });
+  }
+
+  if (
+    currentStopIndex < 0 ||
+    currentStopIndex >= bus.stops.length
+  ) {
+    return res.status(400).json({ error: "Invalid stop index" });
+  }
+
+  bus.currentStopIndex = currentStopIndex;
+  await bus.save();
+
+  res.json({
+    message: "Current stop updated",
+    currentStop: bus.stops[currentStopIndex]
+  });
+});
+
+
+router.post("/start-journey", async (req, res) => {
+  const { busCode, startIndex, direction } = req.body;
+
+  if (!busCode || startIndex === undefined || !direction) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  const bus = await Bus.findOne({ busCode });
+
+  if (!bus) {
+    return res.status(404).json({ error: "Bus not found" });
+  }
+
+  if (bus.isActive) {
+    return res.status(400).json({ error: "Journey already active" });
+  }
+
+  if (startIndex < 0 || startIndex >= bus.stops.length) {
+    return res.status(400).json({ error: "Invalid start stop" });
+  }
+
+  bus.isActive = true;
+  bus.direction = direction;
+  bus.currentStopIndex = startIndex;
+
+  await bus.save();
+
+  res.json({
+    message: "Journey started",
+    busCode,
+    startStop: bus.stops[startIndex],
+    direction
+  });
+});
+
+//END JOURNEY
+router.post("/end-journey", async (req, res) => {
+  const { busCode } = req.body;
+
+  const bus = await Bus.findOne({ busCode });
+
+  if (!bus) {
+    return res.status(404).json({ error: "Bus not found" });
+  }
+
+  if (!bus.isActive) {
+    return res.status(400).json({ error: "No active journey to end" });
+  }
+
+  bus.isActive = false;
+  bus.direction = null;
+  bus.currentStopIndex = null;
+
+  await bus.save();
+
+  res.json({
+    message: "Journey ended",
+    busCode
+  });
+});
 
 module.exports = router;
