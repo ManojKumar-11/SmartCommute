@@ -1,8 +1,8 @@
 import { ScrollView,View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 
-// const API_BASE = "http://192.168.1.3:3000/api"; // change this
-const API_BASE = "http://10.223.134.126:3000/api"; // latpop ip on phone hotspot
+const API_BASE = "http://192.168.1.3:3000/api"; // change this
+// const API_BASE = "http://10.223.134.126:3000/api"; // latpop ip on phone hotspot
 
 export default function SelectStopsScreen({ route, navigation }) {
   const { busCode } = route.params;

@@ -19,23 +19,34 @@ router.post("/buy-ticket", async (req, res) => {
       return res.status(404).json({ error: "Bus not found" });
     }
 
-    const effectiveStops =
-      bus.direction === "FORWARD"
-        ? bus.stops
-        : [...bus.stops].reverse();
+    const { stops, direction } = bus;
 
-    const boardingIndex = effectiveStops.indexOf(boardingStop);
-    const destinationIndex = effectiveStops.indexOf(destinationStop);
+    // physical indices
+    const boardingPhysicalIndex = stops.indexOf(boardingStop);
+    const destinationPhysicalIndex = stops.indexOf(destinationStop);
 
-    if (boardingIndex === -1 || destinationIndex === -1) {
+    if (boardingPhysicalIndex === -1 || destinationPhysicalIndex === -1) {
       return res.status(400).json({ error: "Invalid stops" });
     }
 
-    if (destinationIndex <= boardingIndex) {
+    // map physical → journey indices
+    const boardingJourneyIndex =
+      direction === "FORWARD"
+        ? boardingPhysicalIndex
+        : stops.length - 1 - boardingPhysicalIndex;
+
+    const destinationJourneyIndex =
+      direction === "FORWARD"
+        ? destinationPhysicalIndex
+        : stops.length - 1 - destinationPhysicalIndex;
+
+    if (destinationJourneyIndex <= boardingJourneyIndex) {
       return res.status(400).json({ error: "Invalid stop order" });
     }
 
-    const fare = (destinationIndex - boardingIndex) * COST_PER_STOP;
+    const fare =
+      (destinationJourneyIndex - boardingJourneyIndex) * COST_PER_STOP;
+
     const validTill = new Date(Date.now() + 60 * 60 * 1000);
 
     const ticket = new Ticket({
@@ -61,14 +72,15 @@ router.post("/buy-ticket", async (req, res) => {
     await ticket.save();
 
     res.json({
-      ticketId: ticket._id,
-      busCode,
-      boardingStop,
-      destinationStop,
-      fare,
-      validTill,
-      signature
-    });
+    _id: ticket._id,
+    busCode: ticket.busCode,
+    boardingStop: ticket.boardingStop,
+    destinationStop: ticket.destinationStop,
+    fare: ticket.fare,
+    validTill: ticket.validTill,
+    qrSignature: ticket.qrSignature
+});
+
 
   } catch (err) {
     console.error("BUY TICKET ERROR:", err.message);
@@ -139,8 +151,8 @@ router.post("/verify-ticket", async (req, res) => {
 
     return res.json({
       status: "VALID",
-      source: ticket.source,
-      destination: ticket.destination,
+      boardingStop: ticket.boardingStop,
+      destinationStop: ticket.destinationStop,
       fare: ticket.fare
     });
 

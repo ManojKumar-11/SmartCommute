@@ -1,108 +1,83 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { useState } from "react";
 
+const API_BASE = "http://192.168.1.3:3000/api";
+// const API_BASE = "http://10.223.134.126:3000/api"; // change this
+
 export default function StartServiceScreen({ navigation, route }) {
-  // TEMP – replace with backend data
-  const stops = route.params?.stops || [
-    "Vizianagaram",
-    "Anandapuram",
-    "Madhurawada",
-    "Visakhapatnam"
-  ];
+  const { busCode, stops } = route.params;
+
+  const firstIndex = 0;
+  const lastIndex = stops.length - 1;
 
   const [startIndex, setStartIndex] = useState(null);
-  const [direction, setDirection] = useState(null);
 
-  const selectFirstStop = () => {
-    setStartIndex(0);
-    setDirection("FORWARD");
-  };
+  const startService = async () => {
+    if (startIndex === null) {
+      Alert.alert("Select Starting Stop", "Please choose where the bus starts");
+      return;
+    }
 
-  const selectLastStop = () => {
-    setStartIndex(stops.length - 1);
-    setDirection("REVERSE");
-  };
+    const direction =
+      startIndex === firstIndex ? "FORWARD" : "REVERSE";
 
-  const handleStartService = () => {
-    // TODO: call start-journey API
-    // POST /api/conductor/start-journey
+    try {
+      const res = await fetch(`${API_BASE}/conductor/start-journey`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          busCode,
+          direction,
+          startIndex
+        })
+      });
 
-    navigation.goBack();
+      const data = await res.json();
+
+      if (!res.ok) {
+        Alert.alert("Error", data.error || "Failed to start service");
+        return;
+      }
+
+      navigation.goBack(); // BusStatusScreen will refresh via useFocusEffect
+    } catch (err) {
+      Alert.alert("Network Error", "Unable to start service");
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Start Bus Service</Text>
-      <Text style={styles.subtitle}>
-        Select where the service starts from
-      </Text>
+      <Text style={styles.title}>Bus: {busCode}</Text>
+      <Text style={styles.bus}></Text>
 
-      {/* OPTIONS */}
-      <View style={styles.optionBox}>
-        <Pressable
-          style={[
-            styles.optionBtn,
-            startIndex === 0 && styles.selected
-          ]}
-          onPress={selectFirstStop}
-        >
-          <Text style={styles.optionText}>
-            Start from First Stop
-          </Text>
-          <Text style={styles.optionSub}>
-            {stops[0]}
-          </Text>
-        </Pressable>
+      <Text style={styles.label}>Select starting stop</Text>
 
-        <Pressable
-          style={[
-            styles.optionBtn,
-            startIndex === stops.length - 1 && styles.selected
-          ]}
-          onPress={selectLastStop}
-        >
-          <Text style={styles.optionText}>
-            Start from Last Stop
-          </Text>
-          <Text style={styles.optionSub}>
-            {stops[stops.length - 1]}
-          </Text>
-        </Pressable>
-      </View>
+      <Pressable
+        style={[
+          styles.option,
+          startIndex === firstIndex && styles.selected
+        ]}
+        onPress={() => setStartIndex(firstIndex)}
+      >
+        <Text style={styles.optionTitle}>{stops[firstIndex]}</Text>
+      </Pressable>
 
-      {/* CONFIRM */}
-      {startIndex !== null && (
-        <View style={styles.confirmBox}>
-          <Text style={styles.confirmText}>
-            Starting from:{" "}
-            <Text style={styles.bold}>
-              {stops[startIndex]}
-            </Text>
-          </Text>
+      <Pressable
+        style={[
+          styles.option,
+          startIndex === lastIndex && styles.selected
+        ]}
+        onPress={() => setStartIndex(lastIndex)}
+      >
+        <Text style={styles.optionTitle}>{stops[lastIndex]}</Text>
+      </Pressable>
 
-          <Text style={styles.confirmText}>
-            Direction:{" "}
-            <Text style={styles.bold}>
-              {direction === "FORWARD"
-                ? "Towards last stop"
-                : "Towards first stop"}
-            </Text>
-          </Text>
-
-          <Pressable
-            style={styles.confirmBtn}
-            onPress={handleStartService}
-          >
-            <Text style={styles.confirmBtnText}>
-              Confirm & Start Service
-            </Text>
-          </Pressable>
-        </View>
-      )}
+      <Pressable style={styles.startBtn} onPress={startService}>
+        <Text style={styles.startText}>Start Service</Text>
+      </Pressable>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -110,20 +85,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB"
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    marginBottom: 6
+    marginBottom: 8
   },
-  subtitle: {
+  bus: {
     fontSize: 14,
     color: "#6B7280",
-    marginBottom: 24
+    marginBottom: 20
   },
-
-  optionBox: {
-    marginBottom: 24
+  label: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginBottom: 12
   },
-  optionBtn: {
+  option: {
+    backgroundColor: "#FFFFFF",
     padding: 16,
     borderRadius: 10,
     borderWidth: 1,
@@ -131,37 +108,25 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   selected: {
-    borderColor: "#22C55E",
-    backgroundColor: "#ECFDF5"
+    borderColor: "#16A34A",
+    backgroundColor: "#DCFCE7"
   },
-  optionText: {
-    fontSize: 16,
-    fontWeight: "600"
+  optionTitle: {
+    fontWeight: "600",
+    marginBottom: 4
   },
   optionSub: {
     fontSize: 13,
-    color: "#6B7280",
-    marginTop: 4
+    color: "#6B7280"
   },
-
-  confirmBox: {
-    marginTop: 12
-  },
-  confirmText: {
-    fontSize: 14,
-    marginBottom: 6
-  },
-  bold: {
-    fontWeight: "600"
-  },
-  confirmBtn: {
-    marginTop: 16,
-    backgroundColor: "#22C55E",
-    paddingVertical: 14,
+  startBtn: {
+    marginTop: 30,
+    backgroundColor: "#1E3A8A",
+    padding: 16,
     borderRadius: 10,
     alignItems: "center"
   },
-  confirmBtnText: {
+  startText: {
     color: "#FFFFFF",
     fontWeight: "600"
   }

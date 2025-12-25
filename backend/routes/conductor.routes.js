@@ -18,19 +18,13 @@ router.get("/:conductorId/bus", async (req, res) => {
       return res.status(404).json({ error: "No bus assigned to this conductor" });
     }
 
-    // Determine journey order
-    const effectiveStops =
-      bus.direction === "FORWARD"
-        ? bus.stops
-        : [...bus.stops].reverse();
-
     const index = bus.currentStopIndex;
 
     const currentStop =
       typeof index === "number" &&
       index >= 0 &&
-      index < effectiveStops.length
-        ? effectiveStops[index]
+      index < bus.stops.length
+        ? bus.stops[index]
         : null;
 
     return res.json({
@@ -39,8 +33,8 @@ router.get("/:conductorId/bus", async (req, res) => {
       direction: bus.direction,
       currentStopIndex: index,
       currentStop,
-      stops: effectiveStops,
-      totalStops: effectiveStops.length
+      stops: bus.stops,          // PHYSICAL stops only
+      totalStops: bus.stops.length
     });
 
   } catch (err) {
@@ -51,11 +45,10 @@ router.get("/:conductorId/bus", async (req, res) => {
 
 
 // UPDATE CURRENT STOP
-router.post("/update-stop", async (req, res) => {
+router.post("/update-current-stop", async (req, res) => {
   const { busCode, currentStopIndex } = req.body;
-
   const bus = await Bus.findOne({ busCode });
-
+  console.log("reached");
   if (!bus) {
     return res.status(404).json({ error: "Bus not found" });
   }

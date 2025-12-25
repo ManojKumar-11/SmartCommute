@@ -9,7 +9,7 @@ import { useState,useEffect} from "react";
 const CONDUCTOR_ID = "CND-004"; // temporary
 const API_BASE = "http://192.168.1.3:3000/api"; // change this
 // const API_BASE = "http://10.223.134.126:3000/api"; // change this
-export default function BusStatusScreen() {
+export default function BusStatusScreen({navigation}) {
 
     const [bus, setBus] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -93,8 +93,8 @@ export default function BusStatusScreen() {
             disabled={bus?.isActive}
             onPress={() => {
               navigation.navigate("StartService", {
-                busCode: bus.busCode,
-                stops: bus.stops
+                busCode: bus?.busCode,
+                stops: bus?.stops
               });
             }}
           >
@@ -145,7 +145,8 @@ export default function BusStatusScreen() {
               navigation.navigate("MarkCurrentStop", {
                 busCode: bus.busCode,
                 stops: bus.stops,
-                currentStopIndex: bus.currentStopIndex
+                currentStopIndex: bus.currentStopIndex,
+                direction: bus.direction
               });
             }}
           >
@@ -174,6 +175,13 @@ export default function BusStatusScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    paddingHorizontal: 35,
+    paddingTop: 60,
+    paddingBottom: 20,
+    backgroundColor: "#EEF2FF"
+  },
+  center: {
     flex: 1,
     paddingHorizontal: 35,
     paddingTop: 60,

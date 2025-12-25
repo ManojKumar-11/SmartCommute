@@ -11,20 +11,28 @@ router.get("/:busCode", async (req, res) => {
     if (!bus) {
       return res.status(404).json({ error: "Bus not found" });
     }
-    // if (!bus.isActive) {
-    //   return res.status(400).json({
-    //     error: "Bus not in service"
-    //   });
-    // }
-
+    const { stops, direction, currentStopIndex } = bus;
     const effectiveStops =
-        bus.direction === "FORWARD"
-            ? bus.stops
-            : [...bus.stops].reverse();
+      direction === "FORWARD"
+          ? stops
+          : [...stops].reverse();
 
-    const currentStop = effectiveStops[bus.currentStopIndex];
-    const destinationStops = effectiveStops.slice(bus.currentStopIndex + 1);
-    
+      // map physical index → journey index
+    const journeyIndex =
+        direction === "FORWARD"
+          ? currentStopIndex
+          : stops.length - 1 - currentStopIndex;
+
+    const currentStop =
+        journeyIndex >= 0 && journeyIndex < effectiveStops.length
+          ? effectiveStops[journeyIndex]
+          : null;
+
+    const destinationStops =
+        journeyIndex !== null
+          ? effectiveStops.slice(journeyIndex + 1)
+          : [];
+
     res.json({
         busCode: bus.busCode,
         direction: bus.direction,
