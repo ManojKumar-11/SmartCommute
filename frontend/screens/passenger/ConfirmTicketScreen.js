@@ -2,8 +2,7 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-nati
 import { useEffect, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
 
-const API_BASE = "http://192.168.1.3:3000/api"; // change this
-// const API_BASE = "http://10.223.134.126:3000/api"; // change this
+const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ConfirmTicketScreen({ route, navigation }) {
   const { busCode, boardingStop, destinationStop } = route.params;

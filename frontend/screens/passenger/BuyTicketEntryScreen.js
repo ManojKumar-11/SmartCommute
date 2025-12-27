@@ -1,10 +1,8 @@
 const USER_ID = "6945308f6235a613355dcbc7"; // same valid ObjectId you used earlier
-const API_BASE = "http://192.168.1.3:3000/api";
-// const API_BASE = "http://10.223.134.126:3000/api";
-
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function BuyTicketEntryScreen({ navigation }) {
   const openActiveTickets = async () => {

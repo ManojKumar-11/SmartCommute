@@ -7,8 +7,10 @@ import { useState,useEffect} from "react";
 
 //till we make auth
 const CONDUCTOR_ID = "CND-004"; // temporary
-const API_BASE = "http://192.168.1.3:3000/api"; // change this
-// const API_BASE = "http://10.223.134.126:3000/api"; // change this
+
+const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+
+
 export default function BusStatusScreen({navigation}) {
 
     const [bus, setBus] = useState(null);

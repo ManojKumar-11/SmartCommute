@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-const API_BASE = "http://192.168.1.3:3000/api";
+const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function MarkCurrentStopScreen({ navigation, route }) {
   const { busCode, stops, currentStopIndex, direction } = route.params;

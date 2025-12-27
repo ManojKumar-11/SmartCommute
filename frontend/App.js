@@ -4,7 +4,7 @@ import ConductorTabNavigator from "./navigation/ConductorTabNavigator";
 
 import BusQRDevScreen from "./screens/passenger/BusQrDevScreen";
 
-let userRole = "conductor";
+let userRole = "passenger";
 
 export default function App() {
   return (
