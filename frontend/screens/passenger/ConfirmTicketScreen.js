@@ -26,9 +26,8 @@ export default function ConfirmTicketScreen({ route, navigation }) {
     try {
       const res = await fetch(`${API_BASE}/tickets/buy-ticket`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
         body: JSON.stringify({
-          userId: "6945308f6235a613355dcbc7", // replace later
           busCode,
           boardingStop,
           destinationStop

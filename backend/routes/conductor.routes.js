@@ -3,6 +3,11 @@ const router = express.Router();
 const Bus = require("../models/bus");
 const Conductor = require("../models/conductor");
 
+const auth = require("../middleware/auth");//authentication
+const requireRole = require("../middleware/requireRole");//autorization
+
+router.use(auth, requireRole("conductor"));
+
 // GET BUS ASSIGNED TO CONDUCTOR
 router.get("/:conductorId/bus", async (req, res) => {
   try {

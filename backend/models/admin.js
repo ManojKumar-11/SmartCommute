@@ -4,7 +4,12 @@ const adminSchema = new mongoose.Schema({
   name: String,
   adminCode: {
     type: String,
+    required : true,
     unique: true
+  },
+  passwordHash: {
+    type: String,
+    required: true
   },
   createdAt: {
     type: Date,

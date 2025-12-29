@@ -4,11 +4,25 @@ const conductorSchema = new mongoose.Schema({
   name: String,
   conductorId: {
     type: String,
-    unique: true
+    required : true,
+    unique: true// eg : CND-004
   },
-  busCode: {
+  passwordHash: {
     type: String,
     required: true
+  },
+  assignedBus: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Bus",
+    default: null
+  },
+  // busCode: {
+  //   type: String,
+  //   required: true
+  // },
+  isActive: {
+    type: Boolean,
+    default: true
   },
   createdAt: {
     type: Date,

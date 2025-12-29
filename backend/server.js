@@ -15,8 +15,8 @@ const ticketRoutes = require("./routes/ticket.routes");
 const adminRoutes = require("./routes/admin.routes");
 const busRoutes = require("./routes/bus.routes");
 const conductorRoutes = require("./routes/conductor.routes");
-
-
+const authRoutes = require("./routes/auth.routes");
+app.use("/api/auth", authRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/tickets", ticketRoutes);

@@ -12,7 +12,8 @@ const busSchema = new mongoose.Schema({
     unique: true
   },
   numberPlate: {
-    type: String // optional
+    type: String ,// optional
+    unique : true
   },
   stops: {
     type: [String],

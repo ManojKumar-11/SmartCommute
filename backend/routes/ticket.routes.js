@@ -4,13 +4,16 @@ const Ticket = require("../models/ticket");
 const crypto = require("crypto");
 const Bus = require("../models/bus");
 
+const auth = require("../middleware/auth");//authentication
+const requireRole = require("../middleware/requireRole");//autorization
+
 //BUY - TICKET
 const COST_PER_STOP = 5;
-router.post("/buy-ticket", async (req, res) => {
-  const { userId, busCode, boardingStop, destinationStop } = req.body;
-
+router.post("/buy-ticket",auth,requireRole("passenger"), async (req, res) => {
+  const { busCode, boardingStop, destinationStop } = req.body;
+  const userId = req.user.id; // NOT from req.body
   if (!userId || !busCode || !boardingStop || !destinationStop) {
-    return res.status(400).json({ error: "Missing fields" });
+    return res.status(400).json({ error: "Missing fields :(" });
   }
 
   try {
@@ -90,9 +93,8 @@ router.post("/buy-ticket", async (req, res) => {
 
 
 // PASSENGER: GET ACTIVE TICKETS
-router.get("/active/:userId", async (req, res) => {
-  const { userId } = req.params;
-
+router.get("/active",auth,requireRole("passenger"), async (req, res) => {
+  const userId = req.user.id; // NOT from req.body
   try {
     const tickets = await Ticket.find({
       userId,
@@ -107,7 +109,7 @@ router.get("/active/:userId", async (req, res) => {
 
 
 //VERIFY TICKET
-router.post("/verify-ticket", async (req, res) => {
+router.post("/verify-ticket", auth, requireRole("conductor") , async (req, res) => {
   const { ticketId, validTill, signature } = req.body;
 
   if (!ticketId || !validTill || !signature) {
