@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
-
+import { useAuth } from "../../context/AuthContext";
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ConfirmTicketScreen({ route, navigation }) {

@@ -2,8 +2,8 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-
 import { useState,useEffect} from "react";
+import { useAuth } from "../../context/AuthContext";
 
 //till we make auth
 const CONDUCTOR_ID = "CND-004"; // temporary
@@ -12,14 +12,17 @@ const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 
 export default function BusStatusScreen({navigation}) {
-
+    const { token } = useAuth();
     const [bus, setBus] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const fetchBusStatus = async () => {
     try {
+      // console.log(token);
       const res = await fetch(
-        `${API_BASE}/conductor/${CONDUCTOR_ID}/bus`
+        `${API_BASE}/conductor/${CONDUCTOR_ID}/bus`,{
+           headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
+        }
       );
       const data = await res.json();
 

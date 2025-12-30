@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { useState } from "react";
-
+import { useAuth } from "../../context/AuthContext";
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function StartServiceScreen({ navigation, route }) {
+  const { token } = useAuth();
   const { busCode, stops } = route.params;
 
   const firstIndex = 0;
@@ -23,12 +24,12 @@ export default function StartServiceScreen({ navigation, route }) {
     try {
       const res = await fetch(`${API_BASE}/conductor/start-journey`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           busCode,
           direction,
           startIndex
-        })
+        }),
+        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
       });
 
       const data = await res.json();
