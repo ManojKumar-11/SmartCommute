@@ -6,12 +6,13 @@ import {
   FlatList
 } from "react-native";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function MarkCurrentStopScreen({ navigation, route }) {
+  const { token } = useAuth();
   const { busCode, stops, currentStopIndex, direction } = route.params;
-
   const journeyStops =
     direction === "FORWARD"
       ? stops
@@ -44,7 +45,7 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
     //  console.log("Mapped physical index:", physicalIndex);
     await fetch(`${API_BASE}/conductor/update-current-stop`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
       body: JSON.stringify({
         busCode,
         currentStopIndex: physicalIndex

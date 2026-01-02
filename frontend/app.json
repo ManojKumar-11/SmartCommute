@@ -20,7 +20,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.anonymous.SmartCommute"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -28,6 +32,12 @@
     "plugins": [
       "expo-barcode-scanner",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b76e3c45-547e-4635-a66a-39b20c71489c"
+      }
+    },
+    "owner": "manojkumar_2005"
   }
 }

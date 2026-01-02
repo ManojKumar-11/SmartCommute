@@ -9,7 +9,7 @@ export default function ScanTicketStack() {
       <Stack.Screen
         name="ScanTicket"
         component={ScanTicketScreen}
-        options={{ title: "Scan Ticket" }}
+        options={{ title: "Scan Ticket" ,headerShown: false }}
       />
     </Stack.Navigator>
   );

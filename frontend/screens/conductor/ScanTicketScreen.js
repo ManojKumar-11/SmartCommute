@@ -2,13 +2,16 @@ import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-n
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useState, useEffect, useRef } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useAuth } from "../../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 const SCAN_AREA_SIZE = width * 0.7;
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 
 export default function ScanTicketScreen({ navigation }) {
+  const { token } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const scanLineAnim = useRef(new Animated.Value(0)).current;
@@ -77,9 +80,9 @@ export default function ScanTicketScreen({ navigation }) {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/tickets/verify-ticket`, {
+      const res = await fetch(`${API_URL}/tickets/verify-ticket`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
         body: JSON.stringify(payload)
       });
 

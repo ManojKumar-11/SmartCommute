@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+import {useAuth} from "../../context/AuthContext.js";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function BuyTicketEntryScreen({ navigation }) {
+  const {token} = useAuth();
   const openActiveTickets = async () => {
   try {
-    const url = `${API_BASE}/tickets/active`;
+    const url = `${API_URL}/tickets/active`;
 
     // console.log("Fetching:", url);
     const res = await fetch(url, {

@@ -5,7 +5,11 @@ const Stack = createNativeStackNavigator();
 
 export default function PassStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerShown : false,
+    }}
+    >
       <Stack.Screen
         name="PassEntry"
         component={PassEntryScreen}

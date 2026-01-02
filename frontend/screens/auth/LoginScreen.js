@@ -1,9 +1,17 @@
-import { View, Text, TextInput, Pressable, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+} from "react-native";
 import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const ROLES = ["passenger", "conductor", "admin"];
 
@@ -11,6 +19,8 @@ export default function LoginScreen() {
   const { login } = useAuth();
 
   const [role, setRole] = useState("passenger");
+  const [isRegister, setIsRegister] = useState(false);
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +32,11 @@ export default function LoginScreen() {
   }
 
   function getEndpoint() {
-    if (role === "passenger") return "/auth/passenger/login";
+    if (role === "passenger") {
+      return isRegister
+        ? "/auth/passenger/register"
+        : "/auth/passenger/login";
+    }
     if (role === "conductor") return "/auth/conductor/login";
     return "/auth/admin/login";
   }
@@ -37,7 +51,7 @@ export default function LoginScreen() {
     return { adminCode: identifier, password };
   }
 
-  async function handleLogin() {
+  async function handleSubmit() {
     if (!identifier || !password) {
       Alert.alert("Error", "All fields are required");
       return;
@@ -47,19 +61,25 @@ export default function LoginScreen() {
       setLoading(true);
 
       const res = await axios.post(
-        `${API_BASE}${getEndpoint()}`,
+        `${API_URL}${getEndpoint()}`,
         getPayload()
       );
 
-      const { token } = res.data;
+      // REGISTER FLOW
+      if (role === "passenger" && isRegister) {
+        Alert.alert("Success", "Registration successful. Please login.");
+        setIsRegister(false);
+        setPassword("");
+        return;
+      }
 
+      // LOGIN FLOW
+      const { token } = res.data;
       await login(token);
 
-
     } catch (err) {
-      console.log(err);
       Alert.alert(
-        "Login Failed",
+        isRegister ? "Registration Failed" : "Login Failed",
         err.response?.data?.error || "Something went wrong"
       );
     } finally {
@@ -68,8 +88,10 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>SmartCommute Login</Text>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <Text style={styles.title}>
+        {isRegister ? "Passenger Registration" : "SmartCommute Login"}
+      </Text>
 
       {/* ROLE SELECTOR */}
       <View style={styles.roleContainer}>
@@ -78,6 +100,7 @@ export default function LoginScreen() {
             key={r}
             onPress={() => {
               setRole(r);
+              setIsRegister(false);
               setIdentifier("");
               setPassword("");
             }}
@@ -105,6 +128,7 @@ export default function LoginScreen() {
         onChangeText={setIdentifier}
         style={styles.input}
         autoCapitalize="none"
+        autoFocus = {true}
       />
 
       {/* PASSWORD */}
@@ -116,17 +140,35 @@ export default function LoginScreen() {
         secureTextEntry
       />
 
-      {/* LOGIN BUTTON */}
+      {/* SUBMIT BUTTON */}
       <Pressable
         style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleLogin}
+        onPress={handleSubmit}
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? "Logging in..." : "Login"}
+          {loading
+            ? "Please wait..."
+            : isRegister
+            ? "Register"
+            : "Login"}
         </Text>
       </Pressable>
-    </View>
+
+      {/* REGISTER TOGGLE (PASSENGER ONLY) */}
+      {role === "passenger" && (
+        <Pressable
+          onPress={() => setIsRegister((prev) => !prev)}
+          style={styles.toggle}
+        >
+          <Text style={styles.toggleText}>
+            {isRegister
+              ? "Already registered? Login"
+              : "New passenger? Register"}
+          </Text>
+        </Pressable>
+      )}
+    </KeyboardAvoidingView>
   );
 }
 
@@ -184,6 +226,14 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
+    fontWeight: "bold",
+  },
+  toggle: {
+    marginTop: 16,
+    alignItems: "center",
+  },
+  toggleText: {
+    color: "#1E3A8A",
     fontWeight: "bold",
   },
 });

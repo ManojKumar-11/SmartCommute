@@ -21,12 +21,12 @@ export default function BusStatusStack() {
       <Stack.Screen
         name="StartService"
         component={StartServiceScreen}
-        options={{ title: "Start Service" }}
+        options={{ title: "Start Service",headerShown: false }}
       />
       <Stack.Screen
         name="MarkCurrentStop"
         component={MarkCurrentStopScreen}
-        options={{ title: "Mark Current Stop" }}
+        options={{ title: "Mark Current Stop",headerShown: false }}
       />
 
       

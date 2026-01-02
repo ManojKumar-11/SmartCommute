@@ -10,7 +10,7 @@ export default function ProfileStack() {
       <Stack.Screen
         name="Profile"
         component={ConductorProfileScreen}
-        options={{ title: "Profile"}}
+        options={{ title: "Profile",headerShown: false }}
       />
     </Stack.Navigator>
   );

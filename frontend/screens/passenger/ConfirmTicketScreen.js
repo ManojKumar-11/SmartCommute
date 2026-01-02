@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
 import { useAuth } from "../../context/AuthContext";
-const API_BASE = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ConfirmTicketScreen({ route, navigation }) {
+  const {token} = useAuth();
   const { busCode, boardingStop, destinationStop } = route.params;
 
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function ConfirmTicketScreen({ route, navigation }) {
     setError("");
 
     try {
-      const res = await fetch(`${API_BASE}/tickets/buy-ticket`, {
+      const res = await fetch(`${API_URL}/tickets/buy-ticket`, {
         method: "POST",
         headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
         body: JSON.stringify({

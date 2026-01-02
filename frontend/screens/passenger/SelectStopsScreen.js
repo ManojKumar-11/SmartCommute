@@ -1,11 +1,12 @@
 import { ScrollView,View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 export default function SelectStopsScreen({ route, navigation }) {
+  const {token} = useAuth();
   const { busCode } = route.params;
-
   const [loading, setLoading] = useState(true);
   const [boardingStop, setBoardingStop] = useState("");
   const [destinations, setDestinations] = useState([]);
@@ -13,7 +14,9 @@ export default function SelectStopsScreen({ route, navigation }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`${API_BASE}/bus/${busCode}`)
+    fetch(`${API_URL}/bus/${busCode}`,{
+      headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
+    })
       .then(res => res.json())
       .then(data => {
         if (data.error) {

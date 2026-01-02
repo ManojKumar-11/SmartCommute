@@ -44,7 +44,8 @@ export default function ConductorTabNavigator() {
         name="BusStatusTab"
         component={BusStatusStack}
         options={{
-          title: "Bus Status",
+          // title: "Bus Status",
+          headerShown : false,
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 4 }}>
               <Ionicons 
@@ -62,7 +63,8 @@ export default function ConductorTabNavigator() {
         name="ScanTicketTab"
         component={ScanTicketStack}
         options={{
-          title: "Scan Ticket",
+          // title: "Scan Ticket",
+          headerShown : false,
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 2 }}>
               <Ionicons 
@@ -80,7 +82,8 @@ export default function ConductorTabNavigator() {
         name="ProfileTab"
         component={ProfileStack}
         options={{
-          title: "Profile",
+          headerShown : false,
+          // title: "Profile",
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 4 }}>
               <Ionicons 

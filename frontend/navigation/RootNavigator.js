@@ -1,11 +1,11 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import AppDrawerNavigator from "./AppDrawerNavigator";
 import { useAuth } from "../context/AuthContext";
 
-// Navigators you already have
-import PassengerTabNavigator from "./PassengerTabNavigator";
-import ConductorTabNavigator from "./ConductorTabNavigator";
+// // Navigators you already have
+// import PassengerTabNavigator from "./PassengerTabNavigator";
+// import ConductorTabNavigator from "./ConductorTabNavigator";
 
 // Auth screens (you’ll add these)
 import LoginScreen from "../screens/auth/LoginScreen";
@@ -19,20 +19,15 @@ export default function RootNavigator() {
   if (isLoading) return null;
 
   return (
-    <NavigationContainer>
-      {!isAuthenticated ? (
-        // NOT logged in → Auth flow
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={LoginScreen} />
-        </Stack.Navigator>
-      ) : role === "passenger" ? (
-        <PassengerTabNavigator />
-      ) : role === "conductor" ? (
-        <ConductorTabNavigator />
-      ) : (
-        // Admin later
-        null
-      )}
-    </NavigationContainer>
-  );
+  <NavigationContainer>
+    {!isAuthenticated ? (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+      </Stack.Navigator>
+    ) : (
+      <AppDrawerNavigator />
+    )}
+  </NavigationContainer>
+);
+
 }

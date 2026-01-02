@@ -11,12 +11,18 @@ const Stack = createNativeStackNavigator();
 
 export default function BuyTicketStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerShown : false,
+    }}
+    >
       {/* Entry screen → tabs visible */}
       <Stack.Screen
         name="BuyTicketEntry"
         component={BuyTicketEntryScreen}
-        options={{ title: "Buy Ticket" }}
+        options={{
+
+        }}
       />
       <Stack.Screen
         name="BusCodeInput"
