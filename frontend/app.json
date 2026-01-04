@@ -20,7 +20,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "INTERNET",
+        "CAMERA"
+      ],
       "package": "com.manojkumar_2005.SmartCommute"
     }
     ,
