@@ -31,7 +31,9 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-barcode-scanner",
+      ["expo-camera", {
+    "recordAudioPermission": false
+  }],
       "expo-secure-store"
     ],
     "extra": {
