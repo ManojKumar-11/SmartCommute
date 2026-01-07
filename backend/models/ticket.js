@@ -31,8 +31,15 @@ const ticketSchema = new mongoose.Schema({
   },
   qrSignature: {
     type: String,
-    required: true
-}
+    default: null
+  },
+  razorpayOrderId: String,
+  razorpayPaymentId: String,
+  paymentStatus: {
+    type: String,
+    enum: ["PENDING", "PAID"],
+    default: "PENDING"
+  }
 });
 
 module.exports = mongoose.model("Ticket", ticketSchema);

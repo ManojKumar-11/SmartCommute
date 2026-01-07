@@ -53,39 +53,30 @@ router.post("/buy-ticket",auth,requireRole("passenger"), async (req, res) => {
     const validTill = new Date(Date.now() + 60 * 60 * 1000);
 
     const ticket = new Ticket({
-      userId,
-      busCode,
-      boardingStop,
-      destinationStop,
-      fare,
-      validTill
+        userId,
+        busCode,
+        boardingStop,
+        destinationStop,
+        fare,
+        validTill,
+        paymentStatus: "PENDING", 
+        isUsed: false
     });
 
-    const signature = crypto
-      .createHash("sha256")
-      .update(
-        ticket._id.toString() +
-        validTill.toISOString() +
-        process.env.QR_SECRET
-      )
-      .digest("hex");
 
-    ticket.qrSignature = signature;
 
     await ticket.save();
-
     res.json({
-    _id: ticket._id,
-    busCode: ticket.busCode,
-    boardingStop: ticket.boardingStop,
-    destinationStop: ticket.destinationStop,
+    ticketId: ticket._id,
+    busCode,
+    boardingStop,
+    destinationStop,
     fare: ticket.fare,
     validTill: ticket.validTill,
-    qrSignature: ticket.qrSignature
-});
-
-
-  } catch (err) {
+    paymentStatus: ticket.paymentStatus
+    });
+  }
+  catch (err) {
     console.error("BUY TICKET ERROR:", err.message);
     res.status(500).json({ error: "Ticket creation failed" });
   }
@@ -108,6 +99,10 @@ router.get("/active",auth,requireRole("passenger"), async (req, res) => {
 });
 
 
+
+
+
+
 //VERIFY TICKET
 router.post("/verify-ticket", auth, requireRole("conductor") , async (req, res) => {
   const { ticketId, validTill, signature } = req.body;
@@ -121,6 +116,11 @@ router.post("/verify-ticket", auth, requireRole("conductor") , async (req, res) 
 
     if (!ticket) {
       return res.status(404).json({ error: "Ticket not found" });
+    }
+
+    // PAYMENT CHECK
+    if (ticket.paymentStatus !== "PAID") {
+      return res.status(403).json({ error: "Ticket not paid" });
     }
 
     // 1️ Recompute signature
@@ -163,5 +163,30 @@ router.post("/verify-ticket", auth, requireRole("conductor") , async (req, res) 
   }
 });
 
+// GET TICKET BY ID (Passenger)
+//DYNAMIC ROUTES SHOULD BE LAST
+router.get(
+  "/:ticketId",
+  auth,
+  requireRole("passenger"),
+  async (req, res) => {
+    try {
+      const ticket = await Ticket.findById(req.params.ticketId);
 
+      if (!ticket) {
+        return res.status(404).json({ error: "Ticket not found" });
+      }
+
+      // Security: only owner can view
+      if (ticket.userId.toString() !== req.user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      res.json(ticket);
+    } catch (err) {
+      console.log("failed ");
+      res.status(500).json({ error: "Failed to fetch ticket" });
+    }
+  }
+);
 module.exports = router;

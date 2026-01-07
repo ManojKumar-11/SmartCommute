@@ -30,6 +30,7 @@ export default function TicketQRScreen({ route, navigation }) {
 
   return () => backHandler.remove();
 }, []);
+    
 
   return (
     <View style={styles.container}>

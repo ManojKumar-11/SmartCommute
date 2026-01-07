@@ -16,7 +16,6 @@ export default function BuyTicketEntryScreen({ navigation }) {
       });
     // console.log("Status:", res.status);
     const tickets = await res.json();
-    // console.log("Tickets:", tickets);
     navigation.navigate("ActiveTickets", { tickets });
   } catch (err) {
     console.log("Active tickets fetch error:", err);

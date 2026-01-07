@@ -2,7 +2,10 @@ import QRCode from "react-native-qrcode-svg";
 import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
 
 export default function ActiveTicketsScreen({ navigation, route }) {
-  const tickets = route.params?.tickets || [];
+  const tickets = Array.isArray(route.params?.tickets)
+  ? route.params.tickets
+  : [];
+
 
   if (tickets.length === 0) {
     return (
@@ -11,8 +14,10 @@ export default function ActiveTicketsScreen({ navigation, route }) {
       </View>
     );
   }
+  console.log("tickets type:", Array.isArray(tickets), tickets);
 
   return (
+    <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
     <FlatList
       contentContainerStyle={styles.list}
       data={tickets}
@@ -56,8 +61,8 @@ export default function ActiveTicketsScreen({ navigation, route }) {
            </View>
         </Pressable>
         )}
-
     />
+    </View>
   );
 }
 const styles = StyleSheet.create({

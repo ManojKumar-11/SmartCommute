@@ -1,33 +1,29 @@
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { use, useEffect, useState } from "react";
-import QRCode from "react-native-qrcode-svg";
+import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { payForTicket } from "../../services/paymentService";
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ConfirmTicketScreen({ route, navigation }) {
-  const {token} = useAuth();
+  const { token } = useAuth();
   const { busCode, boardingStop, destinationStop } = route.params;
 
   const [loading, setLoading] = useState(false);
-  const [ticket, setTicket] = useState(null);
   const [error, setError] = useState("");
-  // After purchase → show QR (temporary here)
-  useEffect(() => {
-  if (ticket) {
-    navigation.replace("TicketQR", { ticket });
-  }
-}, [ticket]);
 
-
-  
-  const buyTicket = async () => {
+  const confirmAndPay = async () => {
     setLoading(true);
     setError("");
 
     try {
+      // 1️⃣ Create ticket (PENDING)
       const res = await fetch(`${API_URL}/tickets/buy-ticket`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
           busCode,
           boardingStop,
@@ -36,14 +32,16 @@ export default function ConfirmTicketScreen({ route, navigation }) {
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      // 2️⃣ Start payment
+      await payForTicket({
+        ticketId: data.ticketId,
+        token,
+        navigation
+      });
 
-      if (!res.ok) {
-        setError(data.error || "Ticket purchase failed");
-      } else {
-        setTicket(data);
-      }
     } catch (e) {
-      setError("Network error");
+      setError(e.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -57,8 +55,6 @@ export default function ConfirmTicketScreen({ route, navigation }) {
     );
   }
 
-
-  // Before purchase → confirmation
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Bus</Text>
@@ -72,12 +68,13 @@ export default function ConfirmTicketScreen({ route, navigation }) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Pressable style={styles.button} onPress={buyTicket}>
-        <Text style={styles.buttonText}>Confirm & Buy Ticket</Text>
+      <Pressable style={styles.button} onPress={confirmAndPay}>
+        <Text style={styles.buttonText}>Pay & Get Ticket</Text>
       </Pressable>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
