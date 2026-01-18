@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ScanTicketScreen from "../../screens/conductor/ScanTicketScreen";
-
+import ScanScreen from "../../screens/conductor/ScanScreen";
+import VerifiedPassScreen from "../../screens/conductor/VerifiedPassScreen";
 const Stack = createNativeStackNavigator();
 
 export default function ScanTicketStack() {
@@ -8,7 +8,12 @@ export default function ScanTicketStack() {
     <Stack.Navigator>
       <Stack.Screen
         name="ScanTicket"
-        component={ScanTicketScreen}
+        component={ScanScreen}
+        options={{ title: "Scan Ticket" ,headerShown: false }}
+      />
+      <Stack.Screen
+        name="VerifiedPassScreen"
+        component={ScanScreen}
         options={{ title: "Scan Ticket" ,headerShown: false }}
       />
     </Stack.Navigator>

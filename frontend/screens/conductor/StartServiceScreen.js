@@ -29,7 +29,11 @@ export default function StartServiceScreen({ navigation, route }) {
           direction,
           startIndex
         }),
-        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+        },
       });
 
       const data = await res.json();

@@ -15,7 +15,11 @@ export default function SelectStopsScreen({ route, navigation }) {
 
   useEffect(() => {
     fetch(`${API_URL}/bus/${busCode}`,{
-      headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+      },
     })
       .then(res => res.json())
       .then(data => {

@@ -14,7 +14,7 @@ export default function ActiveTicketsScreen({ navigation, route }) {
       </View>
     );
   }
-  console.log("tickets type:", Array.isArray(tickets), tickets);
+  // console.log("tickets type:", Array.isArray(tickets), tickets);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>

@@ -6,11 +6,9 @@ import { useAuth } from "../../context/AuthContext";
 
 const { width, height } = Dimensions.get("window");
 const SCAN_AREA_SIZE = width * 0.7;
-
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-
-export default function ScanTicketScreen({ navigation }) {
+export default function ScanScreen({ navigation }) {
   const { token } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
@@ -37,9 +35,7 @@ export default function ScanTicketScreen({ navigation }) {
     return () => animation.stop();
   }, []);
 
-  if (!permission) {
-    return <View />;
-  }
+  if (!permission) return <View />;
 
   if (!permission.granted) {
     return (
@@ -53,73 +49,10 @@ export default function ScanTicketScreen({ navigation }) {
     );
   }
 
-  const handleScan = async ({ data }) => {
-    if (scanned) return;
-    
-    // Prevent re-scanning the same QR code immediately
-    if (lastScannedData.current === data) return;
-    
-    setScanned(true);
-    lastScannedData.current = data;
-
-    let payload;
-    try {
-      payload = JSON.parse(data);
-    } catch {
-      setAlertModal({
-        type: "invalid",
-        title: "Invalid QR",
-        message: "Unrecognized Ticket"
-      });
-      setTimeout(() => {
-        setScanned(false);
-        lastScannedData.current = null;
-        setAlertModal(null);
-      }, 3000);
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/tickets/verify-ticket`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
-        body: JSON.stringify(payload)
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        // Check if it's already verified (409 status)
-        if (res.status === 409) {
-          setAlertModal({
-            type: "alreadyVerified",
-            title: "Already Verified",
-            message: result.error || "This ticket has already been used"
-          });
-        } else {
-          // Other invalid cases (expired, tampered, not found, etc.)
-          setAlertModal({
-            type: "invalid",
-            title: "INVALID",
-            message: result.error || "Ticket rejected"
-          });
-        }
-      } else {
-        // Valid ticket
-        setAlertModal({
-          type: "valid",
-          title: "VALID TICKET",
-          message: `₹${result.fare}\n${result.boardingStop} → ${result.destinationStop}`
-        });
-      }
-    } catch (err) {
-      setAlertModal({
-        type: "invalid",
-        title: "Error",
-        message: "Network error"
-      });
-    }
-
+  // -------------------------
+  // Helpers
+  // -------------------------
+  const resetScanner = () => {
     setTimeout(() => {
       setScanned(false);
       lastScannedData.current = null;
@@ -127,129 +60,215 @@ export default function ScanTicketScreen({ navigation }) {
     }, 3000);
   };
 
+  const showInvalidQR = (msg = "Unrecognized QR") => {
+    setAlertModal({
+      type: "invalid",
+      title: "INVALID QR",
+      message: msg,
+    });
+    resetScanner();
+  };
+
+  // -------------------------
+  // Main Scan Handler
+  // -------------------------
+  const handleScan = async ({ data }) => {
+    if (scanned) return;
+    if (lastScannedData.current === data) return;
+
+    setScanned(true);
+    lastScannedData.current = data;
+
+    let payload;
+    try {
+      payload = JSON.parse(data);
+    } catch {
+      showInvalidQR();
+      return;
+    }
+
+    try {
+      // ==========================
+      // 🎫 TICKET FLOW (UNCHANGED)
+      // ==========================
+      if (payload.type === "TICKET") {
+        const res = await fetch(`${API_URL}/tickets/verify-ticket`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "X-Tunnel-Skip-AntiPhishing-Page": "true",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          if (res.status === 409) {
+            setAlertModal({
+              type: "alreadyVerified",
+              title: "Already Used",
+              message: result.error || "Ticket already used",
+            });
+          } else {
+            setAlertModal({
+              type: "invalid",
+              title: "INVALID",
+              message: result.error || "Ticket rejected",
+            });
+          }
+        } else {
+          setAlertModal({
+            type: "valid",
+            title: "VALID TICKET",
+            message: `₹${result.fare}\n${result.boardingStop} → ${result.destinationStop}`,
+          });
+        }
+
+        resetScanner();
+        return;
+      }
+
+      // ==========================
+      // 🪪 PASS FLOW (NEW)
+      // ==========================
+      if (payload.type === "PASS") {
+        const res = await fetch(`${API_URL}/pass/verify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "X-Tunnel-Skip-AntiPhishing-Page": "true",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok || !result.valid) {
+          setAlertModal({
+            type: "invalid",
+            title: "INVALID PASS",
+            message: result.reason || "Pass rejected",
+          });
+          resetScanner();
+          return;
+        }
+
+        // ✅ Valid pass → full screen
+        setScanned(false);
+        lastScannedData.current = null;
+        setAlertModal(null);
+
+        navigation.navigate("VerifiedPass", {
+          user: result.user,
+          validTill: result.validTill,
+        });
+        return;
+      }
+
+      // ==========================
+      // ❌ UNKNOWN TYPE
+      // ==========================
+      showInvalidQR("Unknown QR type");
+
+    } catch (err) {
+      setAlertModal({
+        type: "invalid",
+        title: "Error",
+        message: "Network error",
+      });
+      resetScanner();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <CameraView
         style={StyleSheet.absoluteFillObject}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"]
-        }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
         onBarcodeScanned={scanned ? undefined : handleScan}
       />
 
-      {/* Top Header */}
+      {/* Header */}
       <View style={styles.header}>
-        {navigation && (
-          <Pressable
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </Pressable>
-        )}
-        <Text style={styles.headerText}>Scan Ticket QR Code</Text>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+        </Pressable>
+        <Text style={styles.headerText}>Scan QR Code</Text>
         <View style={styles.backButton} />
       </View>
 
-      {/* Overlay with scanning window */}
+      {/* Overlay */}
       <View style={styles.overlay}>
-        {/* Top overlay */}
         <View style={[styles.overlaySection, { height: (height - SCAN_AREA_SIZE) / 2 - 60 }]} />
-        
-        {/* Middle section with scanning window */}
         <View style={styles.middleSection}>
-          {/* Left overlay */}
           <View style={[styles.overlaySection, { width: (width - SCAN_AREA_SIZE) / 2 }]} />
-          
-          {/* Scanning window */}
           <View style={styles.scanWindow}>
-            {/* Corner indicators */}
             <View style={[styles.corner, styles.topLeft]} />
             <View style={[styles.corner, styles.topRight]} />
             <View style={[styles.corner, styles.bottomLeft]} />
             <View style={[styles.corner, styles.bottomRight]} />
-            
-            {/* Scanning line */}
             <Animated.View
               style={[
                 styles.scanLine,
-                {
-                  transform: [{ translateY: scanLineAnim }],
-                },
+                { transform: [{ translateY: scanLineAnim }] },
               ]}
             />
           </View>
-          
-          {/* Right overlay */}
           <View style={[styles.overlaySection, { width: (width - SCAN_AREA_SIZE) / 2 }]} />
         </View>
-        
-        {/* Bottom overlay */}
         <View style={[styles.overlaySection, { height: (height - SCAN_AREA_SIZE) / 2 }]} />
       </View>
 
       {/* Instructions */}
       <View style={styles.instructions}>
         <Text style={styles.instructionText}>
-          Position the ticket QR code within the frame
+          Scan Ticket or Pass QR
         </Text>
         <Text style={styles.instructionSubtext}>
-          Make sure the QR code is clear and well-lit
+          Hold steady for quick verification
         </Text>
       </View>
 
-      {/* Custom Alert Modal */}
+      {/* Ticket Modal ONLY */}
       {alertModal && (
         <View style={styles.modalOverlay}>
-          <View style={[
-            styles.modalContainer,
-            alertModal.type === "valid" && styles.modalValid,
-            alertModal.type === "alreadyVerified" && styles.modalAlreadyVerified,
-            alertModal.type === "invalid" && styles.modalInvalid
-          ]}>
-            {/* Icon */}
-            <View style={[
-              styles.modalIconContainer,
-              alertModal.type === "valid" && styles.modalIconValid,
-              alertModal.type === "alreadyVerified" && styles.modalIconAlreadyVerified,
-              alertModal.type === "invalid" && styles.modalIconInvalid
-            ]}>
-              {alertModal.type === "valid" && (
-                <Ionicons name="checkmark-circle" size={64} color="#16A34A" />
-              )}
-              {alertModal.type === "alreadyVerified" && (
-                <Ionicons name="warning" size={64} color="#F97316" />
-              )}
-              {alertModal.type === "invalid" && (
-                <Ionicons name="close-circle" size={64} color="#DC2626" />
-              )}
-            </View>
-
-            {/* Title */}
-            <Text style={[
-              styles.modalTitle,
-              alertModal.type === "valid" && styles.modalTitleValid,
-              alertModal.type === "alreadyVerified" && styles.modalTitleAlreadyVerified,
-              alertModal.type === "invalid" && styles.modalTitleInvalid
-            ]}>
-              {alertModal.title}
-            </Text>
-
-            {/* Message */}
-            <Text style={[
-              styles.modalMessage,
-              alertModal.type === "valid" && styles.modalMessageValid,
-              alertModal.type === "alreadyVerified" && styles.modalMessageAlreadyVerified,
-              alertModal.type === "invalid" && styles.modalMessageInvalid
-            ]}>
-              {alertModal.message}
-            </Text>
+          <View
+            style={[
+              styles.modalContainer,
+              alertModal.type === "valid" && styles.modalValid,
+              alertModal.type === "alreadyVerified" && styles.modalAlreadyVerified,
+              alertModal.type === "invalid" && styles.modalInvalid,
+            ]}
+          >
+            <Ionicons
+              name={
+                alertModal.type === "valid"
+                  ? "checkmark-circle"
+                  : alertModal.type === "alreadyVerified"
+                  ? "warning"
+                  : "close-circle"
+              }
+              size={64}
+              color={
+                alertModal.type === "valid"
+                  ? "#16A34A"
+                  : alertModal.type === "alreadyVerified"
+                  ? "#F97316"
+                  : "#DC2626"
+              }
+            />
+            <Text style={styles.modalTitle}>{alertModal.title}</Text>
+            <Text style={styles.modalMessage}>{alertModal.message}</Text>
           </View>
         </View>
       )}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

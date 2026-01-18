@@ -12,7 +12,11 @@ export default function BuyTicketEntryScreen({ navigation }) {
     // console.log("Fetching:", url);
     const res = await fetch(url, {
         method: "GET",
-        headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+        },
       });
     // console.log("Status:", res.status);
     const tickets = await res.json();

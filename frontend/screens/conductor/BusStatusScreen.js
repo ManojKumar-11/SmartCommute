@@ -21,7 +21,11 @@ export default function BusStatusScreen({navigation}) {
       // console.log(token);
       const res = await fetch(
         `${API_BASE}/conductor/${CONDUCTOR_ID}/bus`,{
-           headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
+           headers: { 
+             "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
+             'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+           },
         }
       );
       const data = await res.json();
@@ -117,7 +121,11 @@ export default function BusStatusScreen({navigation}) {
             onPress={async () => {
               await fetch(`${API_BASE}/conductor/end-journey`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
+                headers: { 
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                  'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+                },
                 body: JSON.stringify({ busCode: bus.busCode })
               });
 

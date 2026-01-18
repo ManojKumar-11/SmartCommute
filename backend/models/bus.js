@@ -35,7 +35,12 @@ const busSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  district: {
+  type: String,
+  required: true
+}
+
 });
 
 

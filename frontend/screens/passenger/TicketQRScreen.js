@@ -50,6 +50,7 @@ export default function TicketQRScreen({ route, navigation }) {
       <View style={styles.qrContainer}>
         <QRCode
             value={JSON.stringify({
+                type: "TICKET",
                 ticketId: ticket._id,
                 validTill: ticket.validTill,
                 signature: ticket.qrSignature

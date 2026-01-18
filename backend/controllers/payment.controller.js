@@ -100,7 +100,7 @@ const verifyPayment = async (req, res) => {
       return res.status(404).json({ error: "Ticket not found" });
     }
 
-    // 3. Update payment status
+    // 3. Update payment status and add qrsignature
     const signature = crypto
     .createHash("sha256")
     .update(

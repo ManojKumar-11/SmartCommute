@@ -62,7 +62,12 @@ export default function LoginScreen() {
 
       const res = await axios.post(
         `${API_URL}${getEndpoint()}`,
-        getPayload()
+        getPayload(),
+        {
+          headers: {
+            'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+          },
+        }
       );
 
       // REGISTER FLOW
@@ -88,6 +93,7 @@ export default function LoginScreen() {
   }
 
   return (
+    
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <Text style={styles.title}>
         {isRegister ? "Passenger Registration" : "SmartCommute Login"}

@@ -45,7 +45,11 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
     //  console.log("Mapped physical index:", physicalIndex);
     await fetch(`${API_BASE}/conductor/update-current-stop`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${token}`},
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+      },
       body: JSON.stringify({
         busCode,
         currentStopIndex: physicalIndex

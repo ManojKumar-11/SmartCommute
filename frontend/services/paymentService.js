@@ -11,6 +11,7 @@ export async function payForTicket({ ticketId, token, navigation }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        'X-Tunnel-Skip-AntiPhishing-Page': 'true',
       },
       body: JSON.stringify({ ticketId }),
     });
@@ -68,6 +69,7 @@ export async function payForTicket({ ticketId, token, navigation }) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        'X-Tunnel-Skip-AntiPhishing-Page': 'true',
       },
       body: JSON.stringify(paymentData),
     });
@@ -81,6 +83,7 @@ export async function payForTicket({ ticketId, token, navigation }) {
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
         },
       }
     );

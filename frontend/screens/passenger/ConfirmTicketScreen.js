@@ -22,7 +22,8 @@ export default function ConfirmTicketScreen({ route, navigation }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
         },
         body: JSON.stringify({
           busCode,
