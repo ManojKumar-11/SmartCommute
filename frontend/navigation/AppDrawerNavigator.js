@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 import PassengerTabNavigator from "./PassengerTabNavigator";
 import ConductorTabNavigator from "./ConductorTabNavigator";
+import AdminStackNavigator from "./AdminStackNavigator";
 import ProfileScreen from "../screens/common/ProfileScreen";
 
 const Drawer = createDrawerNavigator();
@@ -13,19 +14,21 @@ export default function AppDrawerNavigator() {
 
   return (
     <Drawer.Navigator
-      // screenOptions={{
-      //   headerShown: true,
-      // }}
-      // screenOptions={{
-        
-      // }}
+    // screenOptions={{
+    //   headerShown: true,
+    // }}
+    // screenOptions={{
+
+    // }}
     >
       <Drawer.Screen
         name="Home"
         component={
           role === "passenger"
             ? PassengerTabNavigator
-            : ConductorTabNavigator
+            : role === "conductor"
+              ? ConductorTabNavigator
+              : AdminStackNavigator
         }
         options={{
           title: "Smart Commute",

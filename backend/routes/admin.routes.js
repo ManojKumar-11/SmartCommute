@@ -14,7 +14,7 @@ router.use(auth, requireRole("admin"));
 
 // ADD BUS + ROUTE
 router.post("/add-bus", async (req, res) => {
-  const { busCode,numberPlate, stops, district } = req.body;
+  const { busCode, numberPlate, stops, district } = req.body;
 
   if (!busCode || !Array.isArray(stops) || stops.length < 2 || !district) {
     return res.status(400).json({ error: "Invalid bus data" });
@@ -32,7 +32,7 @@ router.post("/add-bus", async (req, res) => {
 
     res.json({
       message: "Bus added successfully",
-      busCode : bus.busCode,
+      busCode: bus.busCode,
       numberPlate: bus.numberPlate || null,
       stops: bus.stops
     });
@@ -46,6 +46,81 @@ router.post("/add-bus", async (req, res) => {
 });
 
 
+
+// GET ALL BUSES
+router.get("/all-buses", async (req, res) => {
+  try {
+    const buses = await Bus.find().populate("currentConductor", "name conductorId");
+    res.json(buses);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch buses" });
+  }
+});
+
+// REMOVE BUS
+router.delete("/remove-bus/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const bus = await Bus.findById(id);
+    if (!bus) {
+      return res.status(404).json({ error: "Bus not found" });
+    }
+
+    // If a conductor is assigned, unassign them
+    if (bus.currentConductor) {
+      const conductor = await Conductor.findById(bus.currentConductor);
+      if (conductor) {
+        conductor.assignedBus = null;
+        await conductor.save();
+      }
+    }
+
+    await Bus.findByIdAndDelete(id);
+    res.json({ message: "Bus deleted successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to delete bus" });
+  }
+});
+
+// EDIT BUS
+router.put("/edit-bus/:id", async (req, res) => {
+  const { id } = req.params;
+  const { busCode, numberPlate, stops, district } = req.body;
+
+  if (!busCode || !Array.isArray(stops) || stops.length < 2 || !district) {
+    return res.status(400).json({ error: "Invalid bus data" });
+  }
+
+  try {
+    const bus = await Bus.findById(id);
+    if (!bus) {
+      return res.status(404).json({ error: "Bus not found" });
+    }
+
+    // Update fields
+    bus.busCode = busCode;
+    bus.numberPlate = numberPlate;
+    bus.stops = stops;
+    bus.district = district;
+
+    await bus.save();
+
+    res.json({
+      message: "Bus updated successfully",
+      bus
+    });
+
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: "Bus Code or Number Plate already exists" });
+    }
+    console.error(err);
+    res.status(500).json({ error: "Failed to update bus" });
+  }
+});
 
 // ADD CONDUCTOR (NO BUS)
 router.post("/add-conductor", async (req, res) => {
@@ -80,6 +155,16 @@ router.post("/add-conductor", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to add conductor" });
+  }
+});
+
+// GET ALL CONDUCTORS
+router.get("/all-conductors", async (req, res) => {
+  try {
+    const conductors = await Conductor.find().populate("assignedBus", "busCode numberPlate");
+    res.json(conductors);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch conductors" });
   }
 });
 

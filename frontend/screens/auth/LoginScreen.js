@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
+  Platform, // Added Platform
 } from "react-native";
 import { useState } from "react";
 import axios from "axios";
@@ -23,6 +24,7 @@ export default function LoginScreen() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   function getPlaceholder() {
@@ -93,7 +95,7 @@ export default function LoginScreen() {
   }
 
   return (
-    
+
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <Text style={styles.title}>
         {isRegister ? "Passenger Registration" : "SmartCommute Login"}
@@ -134,17 +136,24 @@ export default function LoginScreen() {
         onChangeText={setIdentifier}
         style={styles.input}
         autoCapitalize="none"
-        autoFocus = {true}
+        autoFocus={true}
+        placeholderTextColor="#9CA3AF"
       />
 
       {/* PASSWORD */}
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-        secureTextEntry
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.passwordInput}
+          secureTextEntry={!showPassword}
+          placeholderTextColor="#9CA3AF"
+        />
+        <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+          <Text style={{ fontSize: 20 }}>{!showPassword ? "🙈" : "👀"}</Text>
+        </Pressable>
+      </View>
 
       {/* SUBMIT BUTTON */}
       <Pressable
@@ -156,8 +165,8 @@ export default function LoginScreen() {
           {loading
             ? "Please wait..."
             : isRegister
-            ? "Register"
-            : "Login"}
+              ? "Register"
+              : "Login"}
         </Text>
       </Pressable>
 
@@ -220,6 +229,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
+    color: "#000",
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    color: "#000",
+  },
+  eyeIcon: {
+    padding: 4
   },
   button: {
     backgroundColor: "#1E3A8A",
