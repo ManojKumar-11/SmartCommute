@@ -9,7 +9,7 @@ import CreatePassScreen from "../../screens/passenger/pass/CreatePassScreen";
 import PaymentPendingScreen from "../../screens/passenger/pass/PaymentPendingScreen";
 import PassHomeScreen from "../../screens/passenger/pass/PassHomeScreen";
 import ViewPassScreen from "../../screens/passenger/pass/ViewPassScreen";
-// import RenewPassScreen from "../../screens/passenger/pass/RenewPassScreen";
+import RenewPassScreen from "../../screens/passenger/pass/RenewPassScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,10 +57,10 @@ export default function PassStack() {
       /> 
 
       {/* Renew */}
-      {/* <Stack.Screen
+      <Stack.Screen
         name="RenewPass"
         component={RenewPassScreen}
-      /> */}
+      /> 
     </Stack.Navigator>
   );
 }

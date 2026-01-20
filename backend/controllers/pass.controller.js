@@ -3,6 +3,7 @@ const Pass = require("../models/pass");
 const PassPaymentIntent = require("../models/passPaymentIntent");
 const Bus = require("../models/bus");
 const User = require("../models/user");
+const { getSystemErrorMap } = require("util");
 
 // helpers
 function getDurationDays(passType) {
@@ -95,6 +96,7 @@ exports.createPass = async (req, res) => {
     await intent.save();
 
     return res.status(201).json({
+      intentType:intent.intentType,
       message: "Pass creation initiated. Proceed to payment.",
       intentId: intent._id,
       amount
@@ -154,12 +156,14 @@ exports.renewPass = async (req, res) => {
       intentType: "RENEW",
       passType,
       durationDays,
-      amount
+      amount,
+      district: pass.district,
     });
 
     await intent.save();
 
     return res.status(201).json({
+      intentType:intent.intentType,
       message: "Pass renewal initiated. Proceed to payment.",
       intentId: intent._id,
       amount
@@ -275,6 +279,7 @@ exports.getMyPass = async (req, res) => {
 
 
 exports.verifyPassQR = async (req, res) => {
+  // console.log("reached");
   try {
     const { passId, qrSignature } = req.body;
     const conductorId = req.user.id;
@@ -285,10 +290,9 @@ exports.verifyPassQR = async (req, res) => {
         reason: "INVALID_QR_DATA"
       });
     }
-
     // 1️⃣ Get conductor's assigned bus
     const bus = await Bus.findOne({ currentConductor: conductorId });
-
+    
     if (!bus || !bus.district) {
       return res.status(403).json({
         valid: false,
@@ -343,6 +347,7 @@ exports.verifyPassQR = async (req, res) => {
     }
 
     // 6️⃣ District enforcement
+    
     if (pass.district !== bus.district) {
       return res.status(403).json({
         valid: false,

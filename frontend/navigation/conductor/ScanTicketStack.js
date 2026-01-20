@@ -12,9 +12,9 @@ export default function ScanTicketStack() {
         options={{ title: "Scan Ticket" ,headerShown: false }}
       />
       <Stack.Screen
-        name="VerifiedPassScreen"
-        component={ScanScreen}
-        options={{ title: "Scan Ticket" ,headerShown: false }}
+        name="VerifiedPass"
+        component={VerifiedPassScreen}
+        options={{ title: "Verified Pass" ,headerShown: false }}
       />
     </Stack.Navigator>
   );

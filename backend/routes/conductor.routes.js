@@ -53,7 +53,7 @@ router.get("/:conductorId/bus", async (req, res) => {
 router.post("/update-current-stop", async (req, res) => {
   const { busCode, currentStopIndex } = req.body;
   const bus = await Bus.findOne({ busCode });
-  console.log("reached");
+  // console.log("reached");
   if (!bus) {
     return res.status(404).json({ error: "Bus not found" });
   }

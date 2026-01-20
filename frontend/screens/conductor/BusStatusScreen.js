@@ -169,7 +169,7 @@ export default function BusStatusScreen({navigation}) {
       </View>
 
       {/* FOOTER ACTION */}
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <Pressable
           style={styles.secondaryBtn}
           onPress={() => {
@@ -181,7 +181,7 @@ export default function BusStatusScreen({navigation}) {
             View Full Route & Stops
           </Text>
         </Pressable>
-      </View>
+      </View> */}
     </View>
   );
 }

@@ -80,11 +80,14 @@ exports.verifyPassPayment = async (req, res) => {
       razorpay_signature
     } = req.body;
 
+    // console.log("verifyPassPayment called with:", { razorpay_order_id, razorpay_payment_id, razorpay_signature });
+
     if (
       !razorpay_order_id ||
       !razorpay_payment_id ||
       !razorpay_signature
     ) {
+      console.log("Missing payment data");
       return res.status(400).json({
         error: "Invalid payment data"
       });
@@ -98,7 +101,11 @@ exports.verifyPassPayment = async (req, res) => {
       .update(body)
       .digest("hex");
 
+    // console.log("Expected signature:", expectedSignature);
+    // console.log("Received signature:", razorpay_signature);
+
     if (expectedSignature !== razorpay_signature) {
+      console.log("Signature mismatch");
       return res.status(400).json({
         error: "Payment verification failed"
       });
@@ -106,30 +113,39 @@ exports.verifyPassPayment = async (req, res) => {
 
     // 2️⃣ Fetch payment intent by user and status (should be only one PENDING)
     const userId = req.user.id;
+    // console.log("User ID:", userId);
     const intent = await PassPaymentIntent.findOne({
       userId,
       paymentStatus: "PENDING"
     });
 
+    // console.log("Found intent:", intent);
+
     if (!intent) {
+      console.log("No pending intent found");
       return res.status(404).json({
         error: "No pending payment intent found"
       });
     }
 
     // 3️⃣ Verify the order ID matches
+    // console.log("Intent order ID:", intent.razorpayOrderId);
+    // console.log("Received order ID:", razorpay_order_id);
     if (intent.razorpayOrderId !== razorpay_order_id) {
+      console.log("Order ID mismatch");
       return res.status(400).json({
         error: "Order ID mismatch"
       });
     }
 
     const paymentDate = new Date();
+    // console.log("Payment date:", paymentDate);
 
     let pass;
 
     // 3️⃣ Apply intent
     if (intent.intentType === "CREATE") {
+      // console.log("Creating new pass");
       // CREATE new pass
       pass = new Pass({
         userId: intent.userId,
@@ -140,12 +156,15 @@ exports.verifyPassPayment = async (req, res) => {
 
       const endDate = addDays(paymentDate, intent.durationDays);
       pass.endDate = endDate;
+      // console.log("Pass end date:", endDate);
 
     } else if (intent.intentType === "RENEW") {
+      // console.log("Renewing existing pass");
       // RENEW existing pass
       pass = await Pass.findById(intent.passId);
 
       if (!pass) {
+        console.log("Pass not found for renewal");
         return res.status(404).json({
           error: "Pass not found for renewal"
         });
@@ -158,8 +177,11 @@ exports.verifyPassPayment = async (req, res) => {
 
       pass.endDate = addDays(baseDate, intent.durationDays);
       pass.status = "ACTIVE";
+      // console.log("Renewed pass end date:", pass.endDate);
     }
+    // console.log("Saving pass...");
     await pass.save();
+    // console.log("Pass saved, ID:", pass._id);
     // 4️ Generate QR signature
     const qrSignature = crypto
       .createHash("sha256")
@@ -173,12 +195,17 @@ exports.verifyPassPayment = async (req, res) => {
       .digest("hex");
 
     pass.qrSignature = qrSignature;
-    
+    // console.log("QR signature generated");
+    await pass.save();
+    // console.log("Pass saved with QR");
 
     // 5️⃣ Finalize intent
     intent.paymentStatus = "PAID";
     intent.razorpayPaymentId = razorpay_payment_id;
     await intent.deleteOne(); // cleanup
+    // console.log("Intent deleted");
+
+    // console.log("Verification successful");
 
     return res.json({
       success: true,

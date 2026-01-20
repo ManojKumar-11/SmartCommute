@@ -1,41 +1,53 @@
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useAuth } from "../../../context/AuthContext";
-// payment service (same pattern as ticket)
-import { payForPass } from "../../../services/passPaymentService";
 import { useEffect } from "react";
-import { BackHandler } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Alert,
+  BackHandler
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
+import { payForPass } from "../../../services/passPaymentService";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function PaymentPendingScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { token } = useAuth();
 
-  const { intent, formData } = route.params;
-  
-  if (!intent || !formData) {
-    Alert.alert("Error", "Invalid payment state");
+  const { intent, formData } = route.params || {};
+
+  if (!intent || !intent.intentId || !intent.intentType) {
+    Alert.alert("Error", "Invalid payment state:)");
     navigation.reset({
-            index: 0,
-            routes: [{ name: 'PassEntry' }],
+      index: 0,
+      routes: [{ name: "PassEntry" }]
     });
     return null;
   }
-    // Inside PaymentPendingScreen
-    useEffect(() => {
+
+  // 🔙 Handle hardware back
+  useEffect(() => {
     const backAction = () => {
-        handleCancel(); // Trigger the same logic as the Cancel button
-        return true; // Prevent default behavior
+      handleCancel();
+      return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
+    const handler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
     );
 
-    return () => backHandler.remove();
-    }, [intent, formData]);
+    return () => handler.remove();
+  }, [intent]);
+
+  // -------------------------
+  // Continue payment
+  // -------------------------
   async function handleContinuePayment() {
     try {
       await payForPass({
@@ -48,49 +60,57 @@ export default function PaymentPendingScreen() {
     }
   }
 
-  
-    async function handleCancel() {
+  // -------------------------
+  // Cancel logic (CREATE vs RENEW)
+  // -------------------------
+  async function handleCancel() {
     Alert.alert(
-        "Cancel Payment",
-        "Go back to edit pass details??",
-        [
+      "Cancel Payment",
+      intent.intentType === "CREATE"
+        ? "Go back to edit pass details?"
+        : "Cancel renewal and go back?",
+      [
         { text: "No" },
         {
-            text: "Yes, Edit",
-            style: "destructive",
-            onPress: async () => {
+          text: "Yes",
+          style: "destructive",
+          onPress: async () => {
             try {
-                // 1. Call your DELETE endpoint to clear the pending state
-                // console.log("Full URL:", `${process.env.EXPO_PUBLIC_API_URL}/pass/payment/intent/${intent.id || intent._id}`);
-                await axios.delete(`${process.env.EXPO_PUBLIC_API_URL}/pass/payment/intent/${intent.intentId}`, {
-                headers: {
+              // 1️⃣ Cancel intent on backend
+              await axios.delete(
+                 
+                `${API_URL}/pass/payment/intent/${intent.intentId}`,
+                // `${API_URL}/pass/payment/intent/696e3c69f5b2e569a5302eef`,
+                {
+                  headers: {
                     Authorization: `Bearer ${token}`,
                     "X-Tunnel-Skip-AntiPhishing-Page": "true"
-                }
-                });
-
-                // 2. Navigate back to CreatePassScreen with the data
-                navigation.replace("CreatePass", {
-                  prefillData: {
-                    name: formData.name,
-                    gender: formData.gender,
-                    dateOfBirth: formData.dob,
-                    aadhaarNumber: formData.aadhaar,
-                    bloodGroup: formData.bloodGroup,
-                    district: formData.district,
-                    passType: formData.passType,
-                    photoUrl: formData.photoUrl
                   }
+                }
+              );
+
+              // 2️⃣ Navigate appropriately
+              if (intent.intentType === "CREATE") {
+                navigation.replace("CreatePass", {
+                  prefillData: formData
                 });
+              } else {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "PassEntry" }]
+                });
+              }
             } catch (err) {
-                console.error(err);
-                Alert.alert("Error", "Could not cancel payment. Please try again.");
+              Alert.alert(
+                "Error",
+                "Could not cancel payment. Try again."
+              );
             }
-            }
+          }
         }
-        ]
+      ]
     );
-    }
+  }
 
   return (
     <View style={styles.container}>
@@ -121,6 +141,7 @@ export default function PaymentPendingScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

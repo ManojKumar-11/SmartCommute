@@ -14,9 +14,9 @@ router.use(auth, requireRole("admin"));
 
 // ADD BUS + ROUTE
 router.post("/add-bus", async (req, res) => {
-  const { busCode,numberPlate, stops } = req.body;
+  const { busCode,numberPlate, stops, district } = req.body;
 
-  if (!busCode || !Array.isArray(stops) || stops.length < 2) {
+  if (!busCode || !Array.isArray(stops) || stops.length < 2 || !district) {
     return res.status(400).json({ error: "Invalid bus data" });
   }
 
@@ -24,7 +24,8 @@ router.post("/add-bus", async (req, res) => {
     const bus = new Bus({
       busCode,
       numberPlate,
-      stops
+      stops,
+      district
     });
 
     await bus.save();

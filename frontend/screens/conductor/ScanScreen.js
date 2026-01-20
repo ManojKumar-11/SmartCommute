@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback  } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "../../context/AuthContext";
+import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 const { width, height } = Dimensions.get("window");
 const SCAN_AREA_SIZE = width * 0.7;
@@ -15,6 +18,14 @@ export default function ScanScreen({ navigation }) {
   const scanLineAnim = useRef(new Animated.Value(0)).current;
   const lastScannedData = useRef(null);
   const [alertModal, setAlertModal] = useState(null);
+  const isFocused = useIsFocused();
+  useFocusEffect(
+    useCallback(() => {
+      setScanned(false);
+      lastScannedData.current = null;
+      setAlertModal(null);
+    }, [])
+  );
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -34,6 +45,8 @@ export default function ScanScreen({ navigation }) {
     animation.start();
     return () => animation.stop();
   }, []);
+
+
 
   if (!permission) return <View />;
 
@@ -160,7 +173,7 @@ export default function ScanScreen({ navigation }) {
         setScanned(false);
         lastScannedData.current = null;
         setAlertModal(null);
-
+        // console.log("verified");
         navigation.navigate("VerifiedPass", {
           user: result.user,
           validTill: result.validTill,
@@ -185,11 +198,14 @@ export default function ScanScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-        onBarcodeScanned={scanned ? undefined : handleScan}
-      />
+      {isFocused && (
+        <CameraView
+          style={StyleSheet.absoluteFillObject}
+          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+          onBarcodeScanned={scanned ? undefined : handleScan}
+        />
+      )}
+
 
       {/* Header */}
       <View style={styles.header}>

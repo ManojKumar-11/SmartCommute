@@ -65,6 +65,7 @@ export default function ConductorTabNavigator() {
         options={{
           // title: "Scan Ticket",
           headerShown : false,
+          unmountOnBlur: true,
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 2 }}>
               <Ionicons 
