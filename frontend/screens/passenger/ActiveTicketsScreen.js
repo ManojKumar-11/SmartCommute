@@ -1,10 +1,10 @@
 import QRCode from "react-native-qrcode-svg";
-import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 
 export default function ActiveTicketsScreen({ navigation, route }) {
   const tickets = Array.isArray(route.params?.tickets)
-  ? route.params.tickets
-  : [];
+    ? route.params.tickets
+    : [];
 
 
   if (tickets.length === 0) {
@@ -18,50 +18,51 @@ export default function ActiveTicketsScreen({ navigation, route }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-    <FlatList
-      contentContainerStyle={styles.list}
-      data={tickets}
-      keyExtractor={(item) => item._id}
-     renderItem={({ item }) => (
-        <Pressable
+      <FlatList
+        contentContainerStyle={styles.list}
+        data={tickets}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
             style={styles.card}
+            activeOpacity={0.7}
             onPress={() =>
-            navigation.navigate("TicketQR", { ticket: item })
+              navigation.navigate("TicketQR", { ticket: item })
             }
-        >
+          >
             <View style={styles.cardContent}>
 
-            {/* Left: Ticket info */}
-            <View style={styles.infoSection}>
+              {/* Left: Ticket info */}
+              <View style={styles.infoSection}>
                 <Text style={styles.bus}>{item.busCode}</Text>
 
                 <Text style={styles.route}>
-                {item.boardingStop} → {item.destinationStop}
+                  {item.boardingStop} → {item.destinationStop}
                 </Text>
 
                 <Text style={styles.meta}>
-                ₹{item.fare} ·{" "}
-                <Text style={item.isUsed ? styles.used : styles.valid}>
+                  ₹{item.fare} ·{" "}
+                  <Text style={item.isUsed ? styles.used : styles.valid}>
                     {item.isUsed ? "USED" : "VALID"}
-                </Text>
+                  </Text>
                 </Text>
 
                 <Text style={styles.time}>
-                Valid till {new Date(item.validTill).toLocaleTimeString()}
+                  Valid till {new Date(item.validTill).toLocaleTimeString()}
                 </Text>
-            </View>
+              </View>
 
-            {/* Right: QR preview */}
-            <View style={styles.qrPreview}>
+              {/* Right: QR preview */}
+              <View style={styles.qrPreview}>
                 <QRCode
-                value={item._id}
-                size={60}
+                  value={item._id}
+                  size={60}
                 />
+              </View>
             </View>
-           </View>
-        </Pressable>
+          </TouchableOpacity>
         )}
-    />
+      />
     </View>
   );
 }

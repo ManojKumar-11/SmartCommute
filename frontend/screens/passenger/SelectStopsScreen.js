@@ -1,4 +1,4 @@
-import { ScrollView,View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -14,8 +14,8 @@ export default function SelectStopsScreen({ route, navigation }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`${API_URL}/bus/${busCode}`,{
-      headers: { 
+    fetch(`${API_URL}/bus/${busCode}`, {
+      headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         'X-Tunnel-Skip-AntiPhishing-Page': 'true',
@@ -58,45 +58,47 @@ export default function SelectStopsScreen({ route, navigation }) {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-    >
+      >
         <Text style={styles.label}>Boarding Stop</Text>
         <View style={styles.lockedBox}>
-            <Text style={styles.lockedText}>{boardingStop}</Text>
+          <Text style={styles.lockedText}>{boardingStop}</Text>
         </View>
 
         <Text style={styles.label}>Select Destination</Text>
 
         {destinations.map(stop => (
-            <Pressable
+          <TouchableOpacity
             key={stop}
             style={[
-                styles.stopItem,
-                selectedDestination === stop && styles.selected
+              styles.stopItem,
+              selectedDestination === stop && styles.selected
             ]}
+            activeOpacity={0.7}
             onPress={() => setSelectedDestination(stop)}
-            >
+          >
             <Text>{stop}</Text>
-            </Pressable>
+          </TouchableOpacity>
         ))}
-      </ScrollView>  
-        <View style={styles.footer}>
-            <Pressable
-                style={[
-                styles.button,
-                !selectedDestination && styles.disabled
-                ]}
-                disabled={!selectedDestination}
-                onPress={() =>
-                navigation.navigate("ConfirmTicket", {
-                    busCode,
-                    boardingStop,
-                    destinationStop: selectedDestination
-                })
-                }
-            >
-                <Text style={styles.buttonText}>Proceed</Text>
-            </Pressable>
-        </View>
+      </ScrollView>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            !selectedDestination && styles.disabled
+          ]}
+          disabled={!selectedDestination}
+          activeOpacity={0.7}
+          onPress={() =>
+            navigation.navigate("ConfirmTicket", {
+              busCode,
+              boardingStop,
+              destinationStop: selectedDestination
+            })
+          }
+        >
+          <Text style={styles.buttonText}>Proceed</Text>
+        </TouchableOpacity>
+      </View>
     </View >
   );
 }
@@ -106,18 +108,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     backgroundColor: "#F9FAFB",
-    paddingBottom : 40
+    paddingBottom: 40
   },
   scrollContent: {
     padding: 24,
     paddingBottom: 120 // IMPORTANT
-    },
+  },
   footer: {
-  padding: 16,
-  borderTopWidth: 1,
-  borderColor: "#E5E7EB",
-  backgroundColor: "#FFFFFF"
-},
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF"
+  },
   center: {
     flex: 1,
     justifyContent: "center",
@@ -150,11 +152,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#DBEAFE"
   },
   button: {
-  backgroundColor: "#1E3A8A",
-  padding: 16,
-  borderRadius: 10,
-  alignItems: "center"
-},
+    backgroundColor: "#1E3A8A",
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center"
+  },
   disabled: {
     backgroundColor: "#9CA3AF"
   },

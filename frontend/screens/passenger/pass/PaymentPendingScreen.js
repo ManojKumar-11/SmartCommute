@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   Alert,
   BackHandler
 } from "react-native";
@@ -78,7 +78,7 @@ export default function PaymentPendingScreen() {
             try {
               // 1️⃣ Cancel intent on backend
               await axios.delete(
-                 
+
                 `${API_URL}/pass/payment/intent/${intent.intentId}`,
                 // `${API_URL}/pass/payment/intent/696e3c69f5b2e569a5302eef`,
                 {
@@ -125,19 +125,21 @@ export default function PaymentPendingScreen() {
         <Text style={styles.amount}>₹{intent.amount}</Text>
       </View>
 
-      <Pressable
+      <TouchableOpacity
         style={styles.primaryBtn}
+        activeOpacity={0.7}
         onPress={handleContinuePayment}
       >
         <Text style={styles.primaryBtnText}>Continue Payment</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable
+      <TouchableOpacity
         style={styles.secondaryBtn}
+        activeOpacity={0.7}
         onPress={handleCancel}
       >
         <Text style={styles.secondaryBtnText}>Cancel</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

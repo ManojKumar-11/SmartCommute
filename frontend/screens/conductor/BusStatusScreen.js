@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -12,21 +12,21 @@ const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
 
 export default function BusStatusScreen({navigation}) {
-    const { token } = useAuth();
-    const [bus, setBus] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
+  const [bus, setBus] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const fetchBusStatus = async () => {
+  const fetchBusStatus = async () => {
     try {
       // console.log(token);
       const res = await fetch(
         `${API_BASE}/conductor/${CONDUCTOR_ID}/bus`,{
-           headers: { 
-             "Content-Type": "application/json",
-             Authorization: `Bearer ${token}`,
-             'X-Tunnel-Skip-AntiPhishing-Page': 'true',
-           },
-        }
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+        },
+      }
       );
       const data = await res.json();
 
@@ -51,10 +51,10 @@ export default function BusStatusScreen({navigation}) {
 
 
   if (loading) {
-  return (
-    <View style={styles.center}>
-      <Text>Loading bus status...</Text>
-    </View>
+    return (
+      <View style={styles.center}>
+        <Text>Loading bus status...</Text>
+      </View>
     );
   }
 
@@ -93,13 +93,14 @@ export default function BusStatusScreen({navigation}) {
 
         {/* SERVICE CONTROLS */}
         <View style={styles.controlRow}>
-          <Pressable
+          <TouchableOpacity
             style={[
               styles.controlBtn,
               styles.startBtn,
               bus?.isActive && styles.disabledBtn
             ]}
             disabled={bus?.isActive}
+            activeOpacity={0.7}
             onPress={() => {
               navigation.navigate("StartService", {
                 busCode: bus?.busCode,
@@ -109,19 +110,20 @@ export default function BusStatusScreen({navigation}) {
           >
             <Text style={styles.controlTitle}>Start Service</Text>
             <Text style={styles.controlSubtitle}>Go online for passengers</Text>
-          </Pressable>
+          </TouchableOpacity>
 
-          <Pressable
+          <TouchableOpacity
             style={[
               styles.controlBtn,
               styles.endBtn,
               !bus?.isActive && styles.disabledBtn
             ]}
             disabled={!bus?.isActive}
+            activeOpacity={0.7}
             onPress={async () => {
               await fetch(`${API_BASE}/conductor/end-journey`, {
                 method: "POST",
-                headers: { 
+                headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${token}`,
                   'X-Tunnel-Skip-AntiPhishing-Page': 'true',
@@ -134,7 +136,7 @@ export default function BusStatusScreen({navigation}) {
           >
             <Text style={styles.controlTitle}>End Service</Text>
             <Text style={styles.controlSubtitle}>Finish today&apos;s trip</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         {/* CURRENT STOP CARD */}
@@ -151,9 +153,10 @@ export default function BusStatusScreen({navigation}) {
             </Text>
           </View>
 
-          <Pressable
+          <TouchableOpacity
             style={[styles.primaryBtn, !bus?.isActive && styles.disabledBtn]}
             disabled={!bus?.isActive}
+            activeOpacity={0.7}
             onPress={() => {
               navigation.navigate("MarkCurrentStop", {
                 busCode: bus.busCode,
@@ -164,7 +167,7 @@ export default function BusStatusScreen({navigation}) {
             }}
           >
             <Text style={styles.primaryText}>Mark Current Stop</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
 

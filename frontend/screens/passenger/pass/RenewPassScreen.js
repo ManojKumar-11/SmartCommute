@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -48,7 +48,7 @@ export default function RenewPassScreen() {
 
       navigation.replace("PaymentPending", {
         intent: res.data,
-        formData : null,
+        formData: null,
       });
     } catch (err) {
       Alert.alert(
@@ -71,12 +71,13 @@ export default function RenewPassScreen() {
       {PASS_OPTIONS.map((option) => {
         const active = option.type === selectedType;
         return (
-          <Pressable
+          <TouchableOpacity
             key={option.type}
             style={[
               styles.optionCard,
               active && styles.optionActive,
             ]}
+            activeOpacity={0.7}
             onPress={() => setSelectedType(option.type)}
           >
             <Text
@@ -90,7 +91,7 @@ export default function RenewPassScreen() {
             <Text style={styles.optionSub}>
               {option.days} days • ₹{option.days * 70}
             </Text>
-          </Pressable>
+          </TouchableOpacity>
         );
       })}
 
@@ -101,12 +102,13 @@ export default function RenewPassScreen() {
       </View>
 
       {/* CTA */}
-      <Pressable
+      <TouchableOpacity
         style={[
           styles.primaryBtn,
           loading && { opacity: 0.6 },
         ]}
         onPress={handleRenew}
+        activeOpacity={0.7}
         disabled={loading}
       >
         {loading ? (
@@ -116,7 +118,7 @@ export default function RenewPassScreen() {
             Proceed to Payment
           </Text>
         )}
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

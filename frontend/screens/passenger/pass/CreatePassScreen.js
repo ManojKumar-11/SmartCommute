@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   Alert,
   ScrollView,
   Image,
@@ -54,14 +54,15 @@ function Dropdown({ label, value, options, onSelect, isOpen, setOpen }) {
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
-      <Pressable
+      <TouchableOpacity
         style={styles.input}
+        activeOpacity={0.7}
         onPress={() => setOpen(label)}
       >
         <Text style={{ color: value ? "#000" : "#9CA3AF" }}>
           {value || `Select ${label}`}
         </Text>
-      </Pressable>
+      </TouchableOpacity>
 
       <Modal visible={isOpen === label} transparent animationType="fade">
         <TouchableWithoutFeedback onPress={() => setOpen(null)}>
@@ -72,16 +73,17 @@ function Dropdown({ label, value, options, onSelect, isOpen, setOpen }) {
               </View>
               <ScrollView>
                 {options.map((opt) => (
-                  <Pressable
+                  <TouchableOpacity
                     key={opt}
                     style={styles.modalItem}
+                    activeOpacity={0.7}
                     onPress={() => {
                       onSelect(opt);
                       setOpen(null);
                     }}
                   >
                     <Text style={styles.modalItemText}>{opt}</Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
             </View>
@@ -97,7 +99,7 @@ function Dropdown({ label, value, options, onSelect, isOpen, setOpen }) {
 export default function CreatePassScreen({ route }) {
   const navigation = useNavigation();
   const { token } = useAuth();
-  
+
   // 1. Get prefill data from navigation params
   const prefill = route.params?.prefillData;
 
@@ -146,9 +148,9 @@ export default function CreatePassScreen({ route }) {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'], 
+      mediaTypes: ['images'],
       allowsEditing: true,
-      aspect: [3, 4], 
+      aspect: [3, 4],
       quality: 0.7,
     });
 
@@ -209,7 +211,7 @@ export default function CreatePassScreen({ route }) {
         }
       });
 
-      navigation.replace("PaymentPending", { 
+      navigation.replace("PaymentPending", {
         intent: res.data,
         formData: {
           ...form,
@@ -288,17 +290,18 @@ export default function CreatePassScreen({ route }) {
             setOpen={setOpenDropdown}
           />
 
-          <Pressable style={styles.secondaryBtn} onPress={pickPassportPhoto}>
+          <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7} onPress={pickPassportPhoto}>
             <Text style={styles.secondaryBtnText}>
               {photoUri ? "Change Passport Photo" : "Upload Passport Photo"}
             </Text>
-          </Pressable>
+          </TouchableOpacity>
 
           {photoUri && <Image source={{ uri: photoUri }} style={styles.preview} />}
 
-          <Pressable
+          <TouchableOpacity
             style={[styles.primaryBtn, (uploading || submitting) && { opacity: 0.6 }]}
             onPress={handleCreatePass}
+            activeOpacity={0.7}
             disabled={uploading || submitting}
           >
             {uploading || submitting ? (
@@ -306,7 +309,7 @@ export default function CreatePassScreen({ route }) {
             ) : (
               <Text style={styles.primaryBtnText}>Proceed to Payment</Text>
             )}
-          </Pressable>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

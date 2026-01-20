@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import BusStatusStack from "./conductor/BusStatusStack";
@@ -37,6 +37,7 @@ export default function ConductorTabNavigator() {
           shadowOpacity: 0.1,
           shadowRadius: 4,
         },
+        tabBarButton: (props) => <TouchableOpacity {...props} activeOpacity={0.6} />,
       }}
     >
       {/* LEFT TAB */}
@@ -48,10 +49,10 @@ export default function ConductorTabNavigator() {
           headerShown : false,
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 4 }}>
-              <Ionicons 
-                name={focused ? "bus" : "bus-outline"} 
-                size={24} 
-                color={color} 
+              <Ionicons
+                name={focused ? "bus" : "bus-outline"}
+                size={24}
+                color={color}
               />
             </View>
           ),
@@ -64,14 +65,14 @@ export default function ConductorTabNavigator() {
         component={ScanTicketStack}
         options={{
           // title: "Scan Ticket",
-          headerShown : false,
+          headerShown: false,
           unmountOnBlur: true,
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 2 }}>
-              <Ionicons 
-                name={focused ? "qr-code" : "qr-code-outline"} 
-                size={26} 
-                color={color} 
+              <Ionicons
+                name={focused ? "qr-code" : "qr-code-outline"}
+                size={26}
+                color={color}
               />
             </View>
           ),
@@ -83,14 +84,14 @@ export default function ConductorTabNavigator() {
         name="ProfileTab"
         component={ProfileStack}
         options={{
-          headerShown : false,
+          headerShown: false,
           // title: "Profile",
           tabBarIcon: ({ color, focused }) => (
             <View style={{ marginBottom: 4 }}>
-              <Ionicons 
-                name={focused ? "person-circle" : "person-circle-outline"} 
-                size={26} 
-                color={color} 
+              <Ionicons
+                name={focused ? "person-circle" : "person-circle-outline"}
+                size={26}
+                color={color}
               />
             </View>
           ),

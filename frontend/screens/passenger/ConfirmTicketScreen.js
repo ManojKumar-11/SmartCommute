@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { payForTicket } from "../../services/paymentService";
@@ -69,9 +69,9 @@ export default function ConfirmTicketScreen({ route, navigation }) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Pressable style={styles.button} onPress={confirmAndPay}>
+      <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={confirmAndPay}>
         <Text style={styles.buttonText}>Pay & Get Ticket</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

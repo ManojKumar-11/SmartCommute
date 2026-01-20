@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function ConductorProfileScreen() {
   return (
@@ -8,9 +8,9 @@ export default function ConductorProfileScreen() {
       <Text style={styles.info}>Conductor ID: CND-001</Text>
       <Text style={styles.info}>Bus: SC-004</Text>
 
-      <Pressable style={styles.logoutBtn}>
+      <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.7}>
         <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useState, useEffect, useRef, useCallback  } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "../../context/AuthContext";
 import { useIsFocused } from "@react-navigation/native";
@@ -55,9 +55,9 @@ export default function ScanScreen({ navigation }) {
       <View style={styles.center}>
         <Ionicons name="camera-outline" size={64} color="#1E3A8A" />
         <Text style={styles.permissionText}>Camera permission is required</Text>
-        <Pressable style={styles.permissionBtn} onPress={requestPermission}>
+        <TouchableOpacity style={styles.permissionBtn} activeOpacity={0.7} onPress={requestPermission}>
           <Text style={styles.permissionBtnText}>Grant Permission</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -209,9 +209,9 @@ export default function ScanScreen({ navigation }) {
 
       {/* Header */}
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} activeOpacity={0.7} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </Pressable>
+        </TouchableOpacity>
         <Text style={styles.headerText}>Scan QR Code</Text>
         <View style={styles.backButton} />
       </View>
@@ -264,16 +264,16 @@ export default function ScanScreen({ navigation }) {
                 alertModal.type === "valid"
                   ? "checkmark-circle"
                   : alertModal.type === "alreadyVerified"
-                  ? "warning"
-                  : "close-circle"
+                    ? "warning"
+                    : "close-circle"
               }
               size={64}
               color={
                 alertModal.type === "valid"
                   ? "#16A34A"
                   : alertModal.type === "alreadyVerified"
-                  ? "#F97316"
-                  : "#DC2626"
+                    ? "#F97316"
+                    : "#DC2626"
               }
             />
             <Text style={styles.modalTitle}>{alertModal.title}</Text>

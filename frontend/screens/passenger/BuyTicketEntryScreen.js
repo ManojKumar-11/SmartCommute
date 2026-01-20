@@ -1,34 +1,34 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useAuth} from "../../context/AuthContext.js";
+import { useAuth } from "../../context/AuthContext.js";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function BuyTicketEntryScreen({ navigation }) {
-  const {token} = useAuth();
+  const { token } = useAuth();
   const openActiveTickets = async () => {
-  try {
-    const url = `${API_URL}/tickets/active`;
+    try {
+      const url = `${API_URL}/tickets/active`;
 
-    // console.log("Fetching:", url);
-    const res = await fetch(url, {
+      // console.log("Fetching:", url);
+      const res = await fetch(url, {
         method: "GET",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
           'X-Tunnel-Skip-AntiPhishing-Page': 'true',
         },
       });
-    // console.log("Status:", res.status);
-    const tickets = await res.json();
-    navigation.navigate("ActiveTickets", { tickets });
-  } catch (err) {
-    console.log("Active tickets fetch error:", err);
-  }
-};
+      // console.log("Status:", res.status);
+      const tickets = await res.json();
+      navigation.navigate("ActiveTickets", { tickets });
+    } catch (err) {
+      console.log("Active tickets fetch error:", err);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      
+
       {/* Header Context */}
       <View style={styles.header}>
         <Text style={styles.subtitle}>
@@ -38,31 +38,32 @@ export default function BuyTicketEntryScreen({ navigation }) {
 
       {/* Main Actions */}
       <View style={styles.actionSection}>
-        <Pressable style={styles.scanCard} onPress={() => navigation.navigate("BusQRScan")}
-          >
+        <TouchableOpacity style={styles.scanCard} activeOpacity={0.7} onPress={() => navigation.navigate("BusQRScan")}
+        >
           <Ionicons name="qr-code-outline" size={72} color="#1E3A8A" />
           <Text style={styles.scanText}>Scan Bus QR</Text>
-        </Pressable>
+        </TouchableOpacity>
 
         <Text style={styles.or}>OR</Text>
 
-        <Pressable style={styles.manualBtn} onPress={() => navigation.navigate("BusCodeInput")}>
+        <TouchableOpacity style={styles.manualBtn} activeOpacity={0.7} onPress={() => navigation.navigate("BusCodeInput")}>
           <Ionicons name="create-outline" size={22} color="#1E3A8A" />
           <Text style={styles.manualText}>Enter Bus Number</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
       {/* Active Tickets Section */}
       <View style={styles.activeTicketsSection}>
-        <Pressable
+        <TouchableOpacity
           style={styles.activeTicketsBtn}
+          activeOpacity={0.7}
           onPress={openActiveTickets}
         >
           <View style={styles.activeTicketsContent}>
             <Ionicons name="ticket-outline" size={26} color="#1E3A8A" />
             <Text style={styles.activeTicketsText}>View Active Tickets</Text>
           </View>
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
       {/* Footer Note */}

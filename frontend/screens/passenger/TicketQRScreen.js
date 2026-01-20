@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { BackHandler } from "react-native";
 import { useEffect } from "react";
@@ -7,30 +7,30 @@ import { useCallback } from "react";
 
 export default function TicketQRScreen({ route, navigation }) {
   useFocusEffect(
-  useCallback(() => {
-    const parent = navigation.getParent();
-    parent?.setOptions({ tabBarStyle: { display: "none" } });
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({ tabBarStyle: { display: "none" } });
 
-    return () => {
-      parent?.setOptions({ tabBarStyle: { display: "flex" } });
-    };
-  }, [navigation])
-);
+      return () => {
+        parent?.setOptions({ tabBarStyle: { display: "flex" } });
+      };
+    }, [navigation])
+  );
   const { ticket } = route.params;
   useEffect(() => {
-  const backAction = () => {
-    navigation.popToTop();
-    return true; // prevent default behavior
-  };
+    const backAction = () => {
+      navigation.popToTop();
+      return true; // prevent default behavior
+    };
 
-  const backHandler = BackHandler.addEventListener(
-    "hardwareBackPress",
-    backAction
-  );
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
 
-  return () => backHandler.remove();
-}, []);
-    
+    return () => backHandler.remove();
+  }, []);
+
 
   return (
     <View style={styles.container}>
@@ -49,13 +49,13 @@ export default function TicketQRScreen({ route, navigation }) {
       {/* QR */}
       <View style={styles.qrContainer}>
         <QRCode
-            value={JSON.stringify({
-                type: "TICKET",
-                ticketId: ticket._id,
-                validTill: ticket.validTill,
-                signature: ticket.qrSignature
-            })}
-            size={260}
+          value={JSON.stringify({
+            type: "TICKET",
+            ticketId: ticket._id,
+            validTill: ticket.validTill,
+            signature: ticket.qrSignature
+          })}
+          size={260}
         />
       </View>
 
@@ -72,12 +72,13 @@ export default function TicketQRScreen({ route, navigation }) {
       </View>
 
       {/* Action */}
-      <Pressable
+      <TouchableOpacity
         style={styles.doneBtn}
+        activeOpacity={0.7}
         onPress={() => navigation.popToTop()}
       >
         <Text style={styles.doneText}>Done</Text>
-      </Pressable>
+      </TouchableOpacity>
 
     </View>
   );

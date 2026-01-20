@@ -2,7 +2,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   FlatList
 } from "react-native";
 import { useState } from "react";
@@ -24,10 +24,10 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
       ? currentStopIndex
       : stops.length - 1 - currentStopIndex;
   };
-    // console.log("Direction:", direction);
-    // console.log("Stops length:", stops.length);
-    // console.log("Current physical index:", currentStopIndex);
-    // console.log("Initial journey index:", getJourneyIndex());
+  // console.log("Direction:", direction);
+  // console.log("Stops length:", stops.length);
+  // console.log("Current physical index:", currentStopIndex);
+  // console.log("Initial journey index:", getJourneyIndex());
   const [selectedJourneyIndex, setSelectedJourneyIndex] = useState(getJourneyIndex());
 
   const getPhysicalIndex = (journeyIndex) => {
@@ -45,7 +45,7 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
     //  console.log("Mapped physical index:", physicalIndex);
     await fetch(`${API_BASE}/conductor/update-current-stop`, {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         'X-Tunnel-Skip-AntiPhishing-Page': 'true',
@@ -74,14 +74,16 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
           const isCurrent = index === selectedJourneyIndex;
 
           return (
-            <Pressable
+            <TouchableOpacity
               style={[
                 styles.stopItem,
                 isCompleted && styles.completed,
                 isCurrent && styles.current
               ]}
-              onPress={() => {setSelectedJourneyIndex(index)
-              //  {console.log("Tapped journey index:", index)}
+              activeOpacity={0.7}
+              onPress={() => {
+                setSelectedJourneyIndex(index)
+                //  {console.log("Tapped journey index:", index)}
               }}
             >
               <Text
@@ -92,22 +94,23 @@ export default function MarkCurrentStopScreen({ navigation, route }) {
               >
                 {item}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           );
         }}
       />
 
-      <Pressable
+      <TouchableOpacity
         style={[
           styles.confirmBtn,
           selectedJourneyIndex === null && { opacity: 0.5 }
         ]}
         disabled={selectedJourneyIndex === null}
+        activeOpacity={0.7}
         onPress={updateCurrentStop}
       >
 
         <Text style={styles.confirmText}>Confirm Current Stop</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

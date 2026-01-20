@@ -1,7 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-// import {CreatePassScreen} from "./CreatePassScreen";
-import CreatePassScreen from "./CreatePassScreen";
 export default function BuyNewPassScreen() {
   const navigation = useNavigation();
 
@@ -16,12 +14,13 @@ export default function BuyNewPassScreen() {
         {"\n"}Buy a new pass to travel seamlessly.
       </Text>
 
-      <Pressable
+      <TouchableOpacity
         style={styles.primaryBtn}
+        activeOpacity={0.7}
         onPress={() => navigation.navigate("CreatePass")}
       >
         <Text style={styles.primaryBtnText}>Buy New Pass</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

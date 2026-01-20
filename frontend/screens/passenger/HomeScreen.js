@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      
+
       {/* Status Section */}
       <View style={styles.statusSection}>
         <View style={styles.statusCard}>
@@ -21,25 +21,27 @@ export default function HomeScreen({ navigation }) {
 
       {/* Actions Section */}
       <View style={styles.actions}>
-        <Pressable
+        <TouchableOpacity
           style={styles.primaryBtn}
+          activeOpacity={0.7}
           onPress={() => navigation.navigate("BuyTicketTab")}
         >
           <Ionicons name="ticket-outline" size={20} color="#FFFFFF" />
           <Text style={styles.primaryBtnText}>
             Buy One-Time Ticket
           </Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           style={styles.secondaryBtn}
+          activeOpacity={0.7}
           onPress={() => navigation.navigate("PassTab")}
         >
           <Ionicons name="card-outline" size={20} color="#1E3A8A" />
           <Text style={styles.secondaryBtnText}>
             View Pass
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
     </View>

@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { TouchableOpacity } from "react-native";
 import HomeStack from "./passenger/HomeStack";
 import BuyTicketStack from "./passenger/BuyTicketStack";
 import PassStack from "./passenger/PassStack";
@@ -13,24 +14,28 @@ export default function PassengerTabNavigator() {
         tabBarActiveTintColor: "#1E3A8A",   // Primary Blue
         tabBarInactiveTintColor: "#6B7280", // Muted Gray,
         headerShown: false,
-        tabBarLabelStyle: { fontSize: 12
+        tabBarLabelStyle: {
+          fontSize: 12
         },
         tabBarStyle: {
-            backgroundColor: "#FFFFFF",
-            borderTopColor: "#E5E7E9",
-        }
-
+          backgroundColor: "#FFFFFF",
+          borderTopColor: "#E5E7E9",
+        },
+        tabBarButton: (props) => <TouchableOpacity {...props} activeOpacity={0.6} />,
       }}
     >
-      <Tab.Screen name="HomeTab" component={HomeStack} 
-      options={{ title: "Home" ,
-            tabBarIcon : ({color,size})=> <Ionicons name="home" size ={size} color = {color}></Ionicons>
+      <Tab.Screen name="HomeTab" component={HomeStack}
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color}></Ionicons>
+        }} />
+      <Tab.Screen name="BuyTicketTab" component={BuyTicketStack} options={{
+        title: "Buy Ticket",
+        tabBarIcon: ({ color, size }) => <Ionicons name="ticket" size={size} color={color}></Ionicons>
       }} />
-      <Tab.Screen name="BuyTicketTab" component={BuyTicketStack} options={{ title: "Buy Ticket",
-                    tabBarIcon : ({color,size})=> <Ionicons name="ticket" size ={size} color = {color}></Ionicons>
-       }} />
-      <Tab.Screen name="PassTab" component={PassStack} options={{ title: "Pass" ,
-                    tabBarIcon : ({color,size})=> <Ionicons name="card-outline" size ={size} color = {color}></Ionicons>
+      <Tab.Screen name="PassTab" component={PassStack} options={{
+        title: "Pass",
+        tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color}></Ionicons>
       }}
       />
     </Tab.Navigator>

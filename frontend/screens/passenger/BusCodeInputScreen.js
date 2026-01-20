@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useState } from "react";
 
 export default function BusCodeInputScreen({ navigation }) {
@@ -7,8 +7,8 @@ export default function BusCodeInputScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.helper}>
-            Enter the bus code shown inside the bus
-        </Text>
+        Enter the bus code shown inside the bus
+      </Text>
 
 
       <TextInput
@@ -20,15 +20,16 @@ export default function BusCodeInputScreen({ navigation }) {
         autoFocus
       />
 
-      <Pressable
+      <TouchableOpacity
         style={styles.button}
         onPress={() =>
           navigation.navigate("SelectStops", { busCode })
         }
+        activeOpacity={0.7}
         disabled={!busCode}
       >
         <Text style={styles.buttonText}>Get Stops List</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -52,10 +53,10 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontWeight: "600" },
   helper: {
-  fontSize: 18,
-  color: "#6B7280",
-  textAlign: "center",
-  marginBottom: 16,
-}
+    fontSize: 18,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 16,
+  }
 
 });

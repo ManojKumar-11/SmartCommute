@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
@@ -29,7 +29,7 @@ export default function StartServiceScreen({ navigation, route }) {
           direction,
           startIndex
         }),
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
           'X-Tunnel-Skip-AntiPhishing-Page': 'true',
@@ -56,29 +56,31 @@ export default function StartServiceScreen({ navigation, route }) {
 
       <Text style={styles.label}>Select starting stop</Text>
 
-      <Pressable
+      <TouchableOpacity
         style={[
           styles.option,
           startIndex === firstIndex && styles.selected
         ]}
+        activeOpacity={0.7}
         onPress={() => setStartIndex(firstIndex)}
       >
         <Text style={styles.optionTitle}>{stops[firstIndex]}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable
+      <TouchableOpacity
         style={[
           styles.option,
           startIndex === lastIndex && styles.selected
         ]}
+        activeOpacity={0.7}
         onPress={() => setStartIndex(lastIndex)}
       >
         <Text style={styles.optionTitle}>{stops[lastIndex]}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable style={styles.startBtn} onPress={startService}>
+      <TouchableOpacity style={styles.startBtn} activeOpacity={0.7} onPress={startService}>
         <Text style={styles.startText}>Start Service</Text>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

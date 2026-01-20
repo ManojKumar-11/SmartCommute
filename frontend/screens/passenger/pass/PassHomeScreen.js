@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function PassHomeScreen() {
@@ -41,21 +41,23 @@ export default function PassHomeScreen() {
 
       {/* Actions */}
       <View style={styles.actions}>
-        <Pressable
+        <TouchableOpacity
           style={styles.primaryBtn}
+          activeOpacity={0.7}
           onPress={() =>
             navigation.navigate("ViewPass", { pass, user })
           }
         >
           <Text style={styles.primaryBtnText}>View My Pass</Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           style={styles.secondaryBtn}
+          activeOpacity={0.7}
           onPress={() => navigation.navigate("RenewPass")}
         >
           <Text style={styles.secondaryBtnText}>Renew Pass</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
