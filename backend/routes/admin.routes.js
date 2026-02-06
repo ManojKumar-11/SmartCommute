@@ -124,7 +124,7 @@ router.put("/edit-bus/:id", async (req, res) => {
 
 // ADD CONDUCTOR (NO BUS)
 router.post("/add-conductor", async (req, res) => {
-  const { name, conductorId, password } = req.body;
+  const { name, conductorId, password, phoneNumber } = req.body;
 
   if (!name || !conductorId || !password) {
     return res.status(400).json({ error: "Missing fields.." });
@@ -140,6 +140,7 @@ router.post("/add-conductor", async (req, res) => {
 
     const conductor = new Conductor({
       name,
+      phoneNumber,
       conductorId,
       passwordHash,
       assignedBus: null

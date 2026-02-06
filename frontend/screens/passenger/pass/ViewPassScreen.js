@@ -12,7 +12,13 @@ export default function ViewPassScreen() {
       <View style={styles.card}>
         {/* Left details */}
         <View style={styles.details}>
+         
           <Text style={styles.cardTitle}>City Bus Pass</Text>
+          <Text style={styles.label}>Pass ID</Text>
+          {/* <Text style={styles.value}>{pass.passNo}</Text> */}
+          {pass.passNo && (
+            <Text style={styles.value}>{pass.passNo}</Text>
+          )}
 
           <Text style={styles.label}>Name</Text>
           <Text style={styles.value}>{user.name}</Text>
@@ -82,8 +88,16 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: 10,
+    marginBottom: 4,
     color: "#1E3A8A"
+  },
+
+  passNo: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#1E3A8A",
+    marginBottom: 8,
+    letterSpacing: 1
   },
 
   label: {

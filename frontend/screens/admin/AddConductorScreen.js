@@ -20,13 +20,14 @@ export default function AddConductorScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
 
     const [name, setName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [conductorId, setConductorId] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async () => {
-        if (!name || !conductorId || !password || !confirmPassword) {
+        if (!name || !phoneNumber || !conductorId || !password || !confirmPassword) {
             Alert.alert("Error", "Please fill in all fields");
             return;
         }
@@ -42,6 +43,7 @@ export default function AddConductorScreen({ navigation }) {
                 `${API_URL}/admin/add-conductor`,
                 {
                     name,
+                    phoneNumber,
                     conductorId,
                     password,
                 },
@@ -73,6 +75,18 @@ export default function AddConductorScreen({ navigation }) {
                         placeholder="e.g. Krishna Kumar"
                         value={name}
                         onChangeText={setName}
+                        placeholderTextColor="#9CA3AF"
+                    />
+                </View>
+
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Phone Number</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="e.g. 9876543210"
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                        keyboardType="phone-pad"
                         placeholderTextColor="#9CA3AF"
                     />
                 </View>

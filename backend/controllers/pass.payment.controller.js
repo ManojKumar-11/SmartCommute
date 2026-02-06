@@ -10,6 +10,28 @@ function addDays(date, days) {
   return d;
 }
 
+// Generate unique pass number
+async function generatePassNo() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let passNo;
+  let isUnique = false;
+
+  while (!isUnique) {
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    passNo = `PASS-${code}`;
+
+    // Check if exists
+    const existing = await Pass.findOne({ passNo });
+    if (!existing) {
+      isUnique = true;
+    }
+  }
+  return passNo;
+}
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET
@@ -146,8 +168,12 @@ exports.verifyPassPayment = async (req, res) => {
     // 3️⃣ Apply intent
     if (intent.intentType === "CREATE") {
       // console.log("Creating new pass");
+      // Generate unique pass number
+      const passNo = await generatePassNo();
+
       // CREATE new pass
       pass = new Pass({
+        passNo,
         userId: intent.userId,
         district: intent.district, // if district stored in intent
         passType: intent.passType,

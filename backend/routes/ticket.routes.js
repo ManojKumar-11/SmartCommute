@@ -9,7 +9,30 @@ const requireRole = require("../middleware/requireRole");//autorization
 
 //BUY - TICKET
 const COST_PER_STOP = 5;
-router.post("/buy-ticket",auth,requireRole("passenger"), async (req, res) => {
+
+// Generate unique ticket number
+const generateTicketNo = async () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let ticketNo;
+  let isUnique = false;
+
+  while (!isUnique) {
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    ticketNo = `TKT-${code}`;
+
+    // Check if exists
+    const existing = await Ticket.findOne({ ticketNo });
+    if (!existing) {
+      isUnique = true;
+    }
+  }
+  return ticketNo;
+};
+
+router.post("/buy-ticket", auth, requireRole("passenger"), async (req, res) => {
   const { busCode, boardingStop, destinationStop } = req.body;
   const userId = req.user.id; // NOT from req.body
   if (!userId || !busCode || !boardingStop || !destinationStop) {
@@ -50,30 +73,35 @@ router.post("/buy-ticket",auth,requireRole("passenger"), async (req, res) => {
     const fare =
       (destinationJourneyIndex - boardingJourneyIndex) * COST_PER_STOP;
 
-    const validTill = new Date(Date.now() + 60 * 60 * 1000);
+    const validTill = new Date(Date.now() + 2 * 60 * 60 * 1000);
+
+    // Generate unique ticket number
+    const ticketNo = await generateTicketNo();
 
     const ticket = new Ticket({
-        userId,
-        busCode,
-        boardingStop,
-        destinationStop,
-        fare,
-        validTill,
-        paymentStatus: "PENDING", 
-        isUsed: false
+      ticketNo,
+      userId,
+      busCode,
+      boardingStop,
+      destinationStop,
+      fare,
+      validTill,
+      paymentStatus: "PENDING",
+      isUsed: false
     });
 
 
 
     await ticket.save();
     res.json({
-    ticketId: ticket._id,
-    busCode,
-    boardingStop,
-    destinationStop,
-    fare: ticket.fare,
-    validTill: ticket.validTill,
-    paymentStatus: ticket.paymentStatus
+      ticketId: ticket._id,
+      ticketNo: ticket.ticketNo,
+      busCode,
+      boardingStop,
+      destinationStop,
+      fare: ticket.fare,
+      validTill: ticket.validTill,
+      paymentStatus: ticket.paymentStatus
     });
   }
   catch (err) {
@@ -84,7 +112,7 @@ router.post("/buy-ticket",auth,requireRole("passenger"), async (req, res) => {
 
 
 // PASSENGER: GET ACTIVE TICKETS
-router.get("/active",auth,requireRole("passenger"), async (req, res) => {
+router.get("/active", auth, requireRole("passenger"), async (req, res) => {
   const userId = req.user.id; // NOT from req.body
   try {
     const tickets = await Ticket.find({
@@ -104,7 +132,7 @@ router.get("/active",auth,requireRole("passenger"), async (req, res) => {
 
 
 //VERIFY TICKET
-router.post("/verify-ticket", auth, requireRole("conductor") , async (req, res) => {
+router.post("/verify-ticket", auth, requireRole("conductor"), async (req, res) => {
   const { ticketId, validTill, signature } = req.body;
 
   if (!ticketId || !validTill || !signature) {

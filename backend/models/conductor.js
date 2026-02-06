@@ -2,9 +2,13 @@ const mongoose = require("mongoose");
 
 const conductorSchema = new mongoose.Schema({
   name: String,
+  phoneNumber: {
+    type: String,
+    required: true 
+  },
   conductorId: {
     type: String,
-    required : true,
+    required: true,
     unique: true// eg : CND-004
   },
   passwordHash: {

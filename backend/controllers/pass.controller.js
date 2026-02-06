@@ -96,7 +96,7 @@ exports.createPass = async (req, res) => {
     await intent.save();
 
     return res.status(201).json({
-      intentType:intent.intentType,
+      intentType: intent.intentType,
       message: "Pass creation initiated. Proceed to payment.",
       intentId: intent._id,
       amount
@@ -163,7 +163,7 @@ exports.renewPass = async (req, res) => {
     await intent.save();
 
     return res.status(201).json({
-      intentType:intent.intentType,
+      intentType: intent.intentType,
       message: "Pass renewal initiated. Proceed to payment.",
       intentId: intent._id,
       amount
@@ -236,30 +236,31 @@ exports.getMyPass = async (req, res) => {
 
       user: user
         ? {
-            name: user.name,
-            gender: user.gender,
-            age,
-            photoUrl: user.photoUrl
-          }
+          name: user.name,
+          gender: user.gender,
+          age,
+          photoUrl: user.photoUrl
+        }
         : null,
 
       pass: pass
         ? {
-            id: pass._id,
-            district: pass.district,
-            passType: pass.passType,
-            status: pass.status,
-            validTill: pass.endDate,
-            qrSignature: pass.qrSignature
-          }
+          id: pass._id,
+          passNo: pass.passNo,
+          district: pass.district,
+          passType: pass.passType,
+          status: pass.status,
+          validTill: pass.endDate,
+          qrSignature: pass.qrSignature
+        }
         : null,
 
       intent: intent
         ? {
-            id: intent._id,
-            intentType: intent.intentType,
-            amount: intent.amount
-          }
+          id: intent._id,
+          intentType: intent.intentType,
+          amount: intent.amount
+        }
         : null,
 
       expiresInDays
@@ -292,7 +293,7 @@ exports.verifyPassQR = async (req, res) => {
     }
     // 1️⃣ Get conductor's assigned bus
     const bus = await Bus.findOne({ currentConductor: conductorId });
-    
+
     if (!bus || !bus.district) {
       return res.status(403).json({
         valid: false,
@@ -347,7 +348,7 @@ exports.verifyPassQR = async (req, res) => {
     }
 
     // 6️⃣ District enforcement
-    
+
     if (pass.district !== bus.district) {
       return res.status(403).json({
         valid: false,

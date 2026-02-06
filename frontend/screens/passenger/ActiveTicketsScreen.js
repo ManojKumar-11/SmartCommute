@@ -1,20 +1,54 @@
 import QRCode from "react-native-qrcode-svg";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, RefreshControl } from "react-native";
+import { useState, useCallback } from "react";
+import { useAuth } from "../../context/AuthContext";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ActiveTicketsScreen({ navigation, route }) {
-  const tickets = Array.isArray(route.params?.tickets)
+  const { token } = useAuth();
+  const initialTickets = Array.isArray(route.params?.tickets)
     ? route.params.tickets
     : [];
 
+  const [tickets, setTickets] = useState(initialTickets);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchActiveTickets = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/tickets/active`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+        },
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setTickets(data);
+      }
+    } catch (err) {
+      console.log("Active tickets fetch error:", err);
+    }
+  }, [token]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchActiveTickets();
+    setRefreshing(false);
+  }, [fetchActiveTickets]);
 
   if (tickets.length === 0) {
     return (
       <View style={styles.center}>
         <Text>No active tickets</Text>
+        <TouchableOpacity onPress={onRefresh} style={[styles.retryBtn, { marginTop: 20 }]}>
+          <Text style={styles.retryText}>Refresh</Text>
+        </TouchableOpacity>
       </View>
     );
   }
-  // console.log("tickets type:", Array.isArray(tickets), tickets);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
@@ -22,6 +56,9 @@ export default function ActiveTicketsScreen({ navigation, route }) {
         contentContainerStyle={styles.list}
         data={tickets}
         keyExtractor={(item) => item._id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -34,6 +71,7 @@ export default function ActiveTicketsScreen({ navigation, route }) {
 
               {/* Left: Ticket info */}
               <View style={styles.infoSection}>
+                <Text style={styles.ticketNo}>{item.ticketNo}</Text>
                 <Text style={styles.bus}>{item.busCode}</Text>
 
                 <Text style={styles.route}>
@@ -47,6 +85,9 @@ export default function ActiveTicketsScreen({ navigation, route }) {
                   </Text>
                 </Text>
 
+                <Text style={styles.date}>
+                  {new Date(item.validTill).toLocaleDateString()}
+                </Text>
                 <Text style={styles.time}>
                   Valid till {new Date(item.validTill).toLocaleTimeString()}
                 </Text>
@@ -89,6 +130,14 @@ const styles = StyleSheet.create({
   infoSection: {
     flex: 1,
     paddingRight: 12
+  },
+
+  ticketNo: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#1E3A8A",
+    marginBottom: 2,
+    letterSpacing: 0.5
   },
 
   bus: {
@@ -135,5 +184,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+
+  retryBtn: {
+    backgroundColor: "#1E3A8A",
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center"
+  },
+
+  retryText: {
+    color: "#FFFFFF",
+    fontWeight: "600"
   }
 });

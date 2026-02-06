@@ -1,14 +1,19 @@
 const mongoose = require("mongoose");
 
 const ticketSchema = new mongoose.Schema({
+  ticketNo: {
+    type: String,
+    unique: true,
+    index: true
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
   },
   busCode: {
-  type: String,
-  required: true
+    type: String,
+    required: true
   },
   boardingStop: {
     type: String,

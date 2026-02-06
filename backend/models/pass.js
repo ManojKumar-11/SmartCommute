@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 
 const passSchema = new mongoose.Schema({
+  passNo: {
+    type: String,
+    unique: true,
+    sparse: true, // allows null for existing passes
+    index: true
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

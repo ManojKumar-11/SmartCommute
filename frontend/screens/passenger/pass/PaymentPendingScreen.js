@@ -21,14 +21,20 @@ export default function PaymentPendingScreen() {
 
   const { intent, formData } = route.params || {};
 
-  if (!intent || !intent.intentId || !intent.intentType) {
-    Alert.alert("Error", "Invalid payment state:)");
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "PassEntry" }]
-    });
-    return null;
-  }
+  // Normalize intent ID (backend sends `id`, some flows might expect `intentId`)
+  const validIntentId = intent?.intentId || intent?.id;
+  const isValid = !!(intent && validIntentId && intent.intentType);
+
+  // 1️⃣ Validate intent safely (Side-effects in useEffect)
+  useEffect(() => {
+    if (!isValid) {
+      Alert.alert("Error", "Invalid payment state");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "PassEntry" }]
+      });
+    }
+  }, [isValid, navigation]);
 
   // 🔙 Handle hardware back
   useEffect(() => {
@@ -45,13 +51,16 @@ export default function PaymentPendingScreen() {
     return () => handler.remove();
   }, [intent]);
 
+  // If invalid, render nothing (navigation reset will happen in useEffect)
+  if (!isValid) return null;
+
   // -------------------------
   // Continue payment
   // -------------------------
   async function handleContinuePayment() {
     try {
       await payForPass({
-        intentId: intent.intentId,
+        intentId: validIntentId,
         token,
         navigation
       });
@@ -78,9 +87,7 @@ export default function PaymentPendingScreen() {
             try {
               // 1️⃣ Cancel intent on backend
               await axios.delete(
-
-                `${API_URL}/pass/payment/intent/${intent.intentId}`,
-                // `${API_URL}/pass/payment/intent/696e3c69f5b2e569a5302eef`,
+                `${API_URL}/pass/payment/intent/${validIntentId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,

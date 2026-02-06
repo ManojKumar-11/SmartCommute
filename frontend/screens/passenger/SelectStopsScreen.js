@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl } from "react-native";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -8,34 +8,47 @@ export default function SelectStopsScreen({ route, navigation }) {
   const {token} = useAuth();
   const { busCode } = route.params;
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [boardingStop, setBoardingStop] = useState("");
   const [destinations, setDestinations] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch(`${API_URL}/bus/${busCode}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        'X-Tunnel-Skip-AntiPhishing-Page': 'true',
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setBoardingStop(data.boardingStop);
-          setDestinations(data.destinationStops);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load bus data");
-        setLoading(false);
+  const fetchBusDetails = async () => {
+    try {
+      const res = await fetch(`${API_URL}/bus/${busCode}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          'X-Tunnel-Skip-AntiPhishing-Page': 'true',
+        },
       });
+      const data = await res.json();
+
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setBoardingStop(data.boardingStop);
+        setDestinations(data.destinationStops);
+        setError(""); // Clear error on success
+      }
+    } catch (err) {
+      setError("Failed to load bus data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusDetails();
   }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchBusDetails().then(() => {
+      setRefreshing(false);
+    });
+  };
 
   if (loading) {
     return (
@@ -49,6 +62,9 @@ export default function SelectStopsScreen({ route, navigation }) {
     return (
       <View style={styles.center}>
         <Text style={styles.error}>{error}</Text>
+        <TouchableOpacity onPress={onRefresh} style={[styles.button, { marginTop: 20 }]}>
+          <Text style={styles.buttonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -58,6 +74,9 @@ export default function SelectStopsScreen({ route, navigation }) {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <Text style={styles.label}>Boarding Stop</Text>
         <View style={styles.lockedBox}>

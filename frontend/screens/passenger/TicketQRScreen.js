@@ -61,11 +61,15 @@ export default function TicketQRScreen({ route, navigation }) {
 
       {/* Ticket details */}
       <View style={styles.details}>
+        <Text style={styles.ticketNo}>{ticket.ticketNo}</Text>
         <Text style={styles.bus}>{ticket.busCode}</Text>
         <Text style={styles.route}>
           {ticket.boardingStop} → {ticket.destinationStop}
         </Text>
         <Text style={styles.fare}>Fare: ₹{ticket.fare}</Text>
+        <Text style={styles.date}>
+          {new Date(ticket.validTill).toLocaleDateString()}
+        </Text>
         <Text style={styles.time}>
           Valid till {new Date(ticket.validTill).toLocaleTimeString()}
         </Text>
@@ -117,6 +121,14 @@ const styles = StyleSheet.create({
 
   details: {
     alignItems: "center"
+  },
+
+  ticketNo: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1E3A8A",
+    marginBottom: 8,
+    letterSpacing: 1
   },
 
   bus: {
