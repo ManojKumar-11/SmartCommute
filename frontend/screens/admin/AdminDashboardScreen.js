@@ -25,20 +25,20 @@ const AdminDashboardScreen = ({ navigation }) => {
             color: "#10B981", // Emerald
             description: "Oversee conductor accounts",
         },
-        {
-            title: "Manage Passes",
-            icon: "card",
-            screen: null, // Future
-            color: "#F59E0B", // Amber
-            description: "Handle visually impaired passes",
-        },
-        {
-            title: "Lost & Found",
-            icon: "search",
-            screen: null, // Future
-            color: "#EF4444", // Red
-            description: "Report and track lost items",
-        },
+        // {
+        //     title: "Manage Passes",
+        //     icon: "card",
+        //     screen: null, // Future
+        //     color: "#F59E0B", // Amber
+        //     description: "Handle visually impaired passes",
+        // },
+        // {
+        //     title: "Lost & Found",
+        //     icon: "search",
+        //     screen: null, // Future
+        //     color: "#EF4444", // Red
+        //     description: "Report and track lost items",
+        // },
     ];
 
     const handlePress = (item) => {

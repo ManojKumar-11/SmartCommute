@@ -1,0 +1,31 @@
+const mongoose = require('mongoose');
+
+const feedbackSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // Assuming 'User' is your passenger model name, check auth logic if it differs
+        required: true
+    },
+    busCode: {
+        type: String,
+        required: true,
+        uppercase: true,
+        trim: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    comment: {
+        type: String,
+        trim: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = mongoose.model('Feedback', feedbackSchema);
