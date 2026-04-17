@@ -1,6 +1,26 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ConductorProfileScreen() {
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+          },
+        },
+      ]
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Conductor Profile</Text>
@@ -8,7 +28,11 @@ export default function ConductorProfileScreen() {
       <Text style={styles.info}>Conductor ID: CND-001</Text>
       <Text style={styles.info}>Bus: SC-004</Text>
 
-      <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.7}>
+      <TouchableOpacity 
+        style={styles.logoutBtn} 
+        activeOpacity={0.7}
+        onPress={handleLogout}
+      >
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>
